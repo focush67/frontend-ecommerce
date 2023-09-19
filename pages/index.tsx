@@ -1,14 +1,30 @@
-import Head from 'next/head'
-import Image from 'next/image'
-import { Inter } from 'next/font/google'
-import styles from '@/styles/Home.module.css'
+import { Product } from '@/lib/models/ProductSchema';
 import Header from '@/components/Header'
 import Featured from '@/components/Featured'
-export default function Home() {
+import { mongooseConnect } from '@/lib/mongoose';
+import NewProducts from '@/components/NewProducts';
+export default function Home({featuredProduct,newProducts}:any) {
   return (
     <div>
       <Header/>
-      <Featured/>
+      <Featured featuredProduct={featuredProduct}/>
+      <NewProducts newProducts={newProducts}/>
     </div>
-  )
-}
+  );
+};
+
+
+export async function getServerSideProps(){
+  const featuredProductID = "65093ed400a643e15b4de727";
+
+  await mongooseConnect();
+
+  const featuredProduct = await Product.findById(featuredProductID);
+  const newProducts = await Product.find({},null,{sort:{'updatedAt':-1}});
+
+  return{
+    props:{
+      newProducts : JSON.parse(JSON.stringify(newProducts)),
+      featuredProduct : JSON.parse(JSON.stringify(featuredProduct))},
+  }
+} 

@@ -46,13 +46,17 @@ const buttonStyles = css`
 
 const StyledButtonPrimary = styled.button`
   ${buttonStyles};
-  background-color: blue;
+  background-color: #0f0f7d;
+
+  &:hover{
+    background-color: #0f0fea;
+  }
 `;
 
 const StyledButtonNeutral = styled.button`
   ${buttonStyles};
   background-color: #000;
-  color: white;
+  color: #f3eaea;
   border: 0.1px solid white;
 `;
 
