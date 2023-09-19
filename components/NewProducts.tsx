@@ -8,34 +8,43 @@ import {ref,listAll,getDownloadURL} from 'firebase/storage';
 const ProductsGrid = styled.div`
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
-    grid-template-rows: 1fr 1fr 1fr;
     gap: 2rem;
     padding: 1rem;
 `
 export default function NewProducts({ newProducts }: any) {
-    const [imageUrls,setImageUrls] = useState([]);
-
+    const [imageUrls,setImageUrls] = useState<string[]>([]);
     useEffect(()=>{
-        const fetchProductImages = async () => {
-            const urls = [];
-            for(const product of newProducts){
-                const imageListReference = ref(storage,`${product.title}/`);
-                try {
-                   const response = await listAll(imageListReference);
-                   if(response.items.length > 0){
-                    const firstImage = response.items[0];
-                    const url = await getDownloadURL(firstImage);
-                    urls.push(url);
-                   } 
-                } catch (error:any) {
-                    console.log(error.message);
-                }
-            }
-        };
+      if(!newProducts){
+        console.log("No Products found");
+        return;
+      }
 
-        fetchProductImages();
+      const fetchImages = async () => {
+        const urls:string[] = [];
+
+        for(const product of newProducts){
+          console.log(product?.imagesFolder);
+          const imageRef = ref(storage,`${product.imagesFolder}/`);
+          try {
+            const response = await listAll(imageRef);
+            const downloadPromises = response.items.map(async (item:any) => {
+              const url = await getDownloadURL(item);
+              return url;
+            });
+
+            const productImageUrls = await Promise.all(downloadPromises);
+            urls.push(...productImageUrls);
+          } catch (error:any) {
+            console.log(error);
+          }
+        }
+
+        setImageUrls(urls);
+      };
+      fetchImages();
     },[newProducts])
-    
+
+    console.log(imageUrls);
 
   return (
     <Center>
@@ -43,7 +52,7 @@ export default function NewProducts({ newProducts }: any) {
         <ProductsGrid>
             {
                newProducts?.length > 0 && newProducts.map((product:any , index:number) => (
-                <ProductBox key={index} product={product} images={imageUrls} />
+                <ProductBox key={index} product={product} imageUrl={imageUrls[index]} />
                ) )
             }
         </ProductsGrid>

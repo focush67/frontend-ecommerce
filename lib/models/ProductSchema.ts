@@ -12,8 +12,7 @@ const productSchema = new Schema({
             name : {type:String,default:""},
             value:{type:String,default:""},
         }
-    ]
-    
+    ],
 })
 
 export const Product = (models.Product || model('Product',productSchema))

@@ -1,32 +1,7 @@
-import styled from "styled-components";
 import PrimaryButton from "./Buttons";
-const Box = styled.div`
-    background-color: #fff;
-    display: grid;
-    padding: 0.6rem;
-    text-align: center;
-    border-radius: 1.2rem;
-    img{
-        width: 100%;
-        max-height: 100px;
-        object-fit: contain;
-        margin: 2rem 0;
-    }
-    div{
-        display: flex;
-        justify-content: space-around;
-        margin: 4px;
-    }
-`
-
-export default function ProductBox({product,imageUrl}:any){
+export default function AddToCart(){
     return(
-        <Box>
-            <img src={imageUrl} alt="image"/>
-            <div><i>{product.title}</i></div>
-            <div>{"$ "+product.price}</div>
-            <div>
-            <PrimaryButton size="medium" background="white">
+        <PrimaryButton size="medium">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
@@ -43,7 +18,5 @@ export default function ProductBox({product,imageUrl}:any){
                   </svg>
                   Add to Cart
                 </PrimaryButton>
-            </div>
-        </Box>
     )
 }

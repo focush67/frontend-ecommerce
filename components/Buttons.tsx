@@ -1,8 +1,9 @@
+import { Props } from "next/script";
 import styled, { css } from "styled-components";
 
 const buttonStyles = css`
   display: inline-flex;
-  background-color: blue;
+  background-color: ${props => props.background || "blue"};
   border: 0;
   color: #fff;
   padding: 11px;
@@ -17,7 +18,6 @@ const buttonStyles = css`
     height: 20px;
     margin-right: 6px;
   }
-
 
   ${props =>
     props.size === "large" &&
@@ -46,10 +46,11 @@ const buttonStyles = css`
 
 const StyledButtonPrimary = styled.button`
   ${buttonStyles};
-  background-color: #0f0f7d;
-
+  background-color: ${props => props.background};
+  color:${props => props.background === "white" ? "black" : "white"};
   &:hover{
-    background-color: #0f0fea;
+    background-color: ${props => props.background === "white" ? props.background : "blue"};
+    font-weight:${props => props.background === "white" ? "bold" : "normal"}
   }
 `;
 

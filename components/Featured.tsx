@@ -25,11 +25,10 @@ export const Description = styled.p`
 `;
 
 export const Wrapper = styled.div`
-  position: relative;
+  align-items: center;
   display: grid;
-  grid-template-columns: 1.1fr 1fr;
+  grid-template-columns: 1fr 1fr;
   gap: 40px;
-
   img {
     max-width: 100%;
     border-radius: 1rem;
@@ -50,13 +49,19 @@ export default function Featured({featuredProduct}:any) {
   useEffect(()=>{
     listAll(imageListReference).then((response:any)=>{
       if(response.items.length > 0){
-        const firstImage = response.items[0];
+        const sortedItems = response.items.sort((a:any,b:any)=>{
+          const fileNameA = a.name.toLowerCase();
+          const fileNameB = b.name.toLowerCase();
+          return fileNameA.localeCompare(fileNameB);
+        });
+
+        const firstImage = sortedItems[0];
         getDownloadURL(firstImage).then((url)=>{
           setImageUrl(url);
         })
       }
     }).catch((error:any)=>console.log(error));
-  },[]);
+  },[])
 
   return (
     <Bg>
@@ -69,8 +74,8 @@ export default function Featured({featuredProduct}:any) {
                 {featuredProduct?.description}
               </Description>
               <Column>
-                <NeutralButton size="medium">Read More</NeutralButton>
-                <PrimaryButton size="medium">
+                <NeutralButton size="large">Read More</NeutralButton>
+                <PrimaryButton size="large">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
