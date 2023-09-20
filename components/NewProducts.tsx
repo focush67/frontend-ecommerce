@@ -1,18 +1,36 @@
 import styled from "styled-components";
-import Center from "./Center";
-import { Column } from "./Featured";
+import { CartContextType, Column } from "./Featured";
 import ProductBox from "./ProductBox";
-import {useEffect, useState} from 'react';
+import {useEffect, useState,useContext} from 'react';
 import {storage} from '@/firebaseConfig';
 import {ref,listAll,getDownloadURL} from 'firebase/storage';
+import axios from "axios";
+import { CartContext } from "./CartContext";
+
 const ProductsGrid = styled.div`
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 2rem;
-    padding: 1rem;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 20px;
+    
 `
+
+const Wrapper = styled.div`
+  display: flex;
+  justify-content: center;
+`
+
+const StyledHeader = styled.h2`
+  font-size: 2rem;
+  text-align: center;
+  margin: 13px 0 0 0;
+  font-weight: 500;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+`
+
 export default function NewProducts({ newProducts }: any) {
-    const [imageUrls,setImageUrls] = useState<string[]>([]);
+    const [productImages,setProductImages] = useState<{[key:string] : string[]}>({});
+    const [load,setLoad] = useState(true);
+    const {setCart} = useContext<CartContextType>(CartContext);
     useEffect(()=>{
       if(!newProducts){
         console.log("No Products found");
@@ -20,10 +38,10 @@ export default function NewProducts({ newProducts }: any) {
       }
 
       const fetchImages = async () => {
-        const urls:string[] = [];
+        const productImagesMap : {[key:string] : string[]} = {};
 
         for(const product of newProducts){
-          console.log(product?.imagesFolder);
+          
           const imageRef = ref(storage,`${product.imagesFolder}/`);
           try {
             const response = await listAll(imageRef);
@@ -33,30 +51,33 @@ export default function NewProducts({ newProducts }: any) {
             });
 
             const productImageUrls = await Promise.all(downloadPromises);
-            urls.push(...productImageUrls);
+            productImagesMap[product?.title] = productImageUrls;
           } catch (error:any) {
             console.log(error);
+            productImagesMap[product?.title] = [];
           }
         }
-
-        setImageUrls(urls);
+        setLoad(false);
+        setProductImages(productImagesMap);
       };
       fetchImages();
     },[newProducts])
 
-    console.log(imageUrls);
-
+    
   return (
-    <Center>
+    <>
+    <StyledHeader>New Arrivals</StyledHeader>
+    <Wrapper>
       <Column>
         <ProductsGrid>
             {
-               newProducts?.length > 0 && newProducts.map((product:any , index:number) => (
-                <ProductBox key={index} product={product} imageUrl={imageUrls[index]} />
-               ) )
+               load ? "Loading Images..." : newProducts?.map((product:any,index:number)=>(
+                <ProductBox key={index} product={product} imageUrl={productImages[product.title]}/>
+               ))
             }
         </ProductsGrid>
       </Column>
-    </Center>
+    </Wrapper>
+    </>
   );
 }

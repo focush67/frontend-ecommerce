@@ -1,49 +1,88 @@
 import styled from "styled-components";
 import PrimaryButton from "./Buttons";
-const Box = styled.div`
-    background-color: #fff;
-    display: grid;
-    padding: 0.6rem;
-    text-align: center;
-    border-radius: 1.2rem;
-    img{
-        width: 100%;
-        max-height: 100px;
-        object-fit: contain;
-        margin: 2rem 0;
-    }
-    div{
-        display: flex;
-        justify-content: space-around;
-        margin: 4px;
-    }
+import axios from "axios";
+import { CartContext } from "./CartContext";
+import {useContext} from 'react';
+import {CartContextType} from './Featured';
+const ProductWrapper = styled.div``;
+
+const WhiteBox = styled.div`
+  background-color: #fff;
+  padding: 20px;
+  height: 120px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 5px;
+  img {
+    max-width: 100%;
+    max-height: 80px;
+  }
+`;
+
+const Title = styled.h2`
+  font-weight: normal;
+  font-size: 0.9rem;
+  margin: 0;
+`;
+
+const ProductInfoBox = styled.div`
+  text-align: center;
+  margin-top: 5px;
+`;
+
+const PriceRow = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  margin-top:2px;
+`;
+
+const Price = styled.div`
+    font-size: 1.3rem;
+    font-weight: bold;
 `
 
-export default function ProductBox({product,imageUrl}:any){
-    return(
-        <Box>
-            <img src={imageUrl} alt="image"/>
-            <div><i>{product.title}</i></div>
-            <div>{"$ "+product.price}</div>
-            <div>
-            <PrimaryButton size="medium" background="white">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth="1.5"
-                    stroke="currentColor"
-                    className="w-6 h-6"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z"
-                    />
-                  </svg>
-                  Add to Cart
-                </PrimaryButton>
-            </div>
-        </Box>
-    )
+export default function ProductBox({ product, imageUrl }: any) {
+
+  const {setCart} = useContext<CartContextType>(CartContext);
+  const fallBackUrl =  "https://picsum.photos/id/237/200/300";
+
+  const addNewProductToCart = async () => {
+    try {
+      const response = await axios.post("/api/cart" , {
+        _id: product._id,
+        title: product.title,
+        price: product.price,
+        coverPhoto: imageUrl[0],
+        quantity: 1,
+      });
+
+      setCart((prev:any) => [...prev , product._id]);
+      console.log(response.data);
+    } catch (error:any) {
+      console.log(error);
+    }
+}
+
+  return (
+    <ProductWrapper>
+      <WhiteBox>
+        <div>
+          <img src={imageUrl[0]} alt="image" onError={(e:any)=>e.currentTarget.src=fallBackUrl}/>
+        </div>
+      </WhiteBox>
+
+      <ProductInfoBox>
+        <Title>{product?.title}</Title>
+        <PriceRow>
+          <Price>${product?.price}</Price>
+          <PrimaryButton background="white" size="small" onClick={addNewProductToCart}>
+          Add to Cart
+        </PrimaryButton>
+        </PriceRow>
+      </ProductInfoBox>
+    </ProductWrapper>
+  );
 }

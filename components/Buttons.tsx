@@ -37,20 +37,16 @@ const buttonStyles = css`
       font-size: 0.9rem;
       padding: 3px 7px;
     `}
-
-    &:hover{
-        transform:scale(1.1);
-        
-    }
 `;
 
 const StyledButtonPrimary = styled.button`
   ${buttonStyles};
-  background-color: ${props => props.background};
-  color:${props => props.background === "white" ? "black" : "white"};
+  background-color: ${props => props.background === "white" ? "transparent" : props.background};
+  border: ${props => props.background === "white" ? "2px solid blue" : "none"};
+  color:${props => props.background === "white" ? "blue" : "white"};
   &:hover{
-    background-color: ${props => props.background === "white" ? props.background : "blue"};
-    font-weight:${props => props.background === "white" ? "bold" : "normal"}
+    background-color: ${props => props.background === "white" ? "blue" : "white"};
+    color:${props => props.background === "white" ? "#fff" : "blue"}
   }
 `;
 

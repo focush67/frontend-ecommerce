@@ -3,7 +3,19 @@ import Center from "./Center";
 import PrimaryButton, { NeutralButton } from "./Buttons";
 import { ref,listAll,getDownloadURL } from "firebase/storage";
 import { storage } from "@/firebaseConfig";
-import { useEffect, useState } from "react";
+import { useEffect, useState,useContext } from "react";
+import Cart from "./Cart";
+import { CartContext } from "./CartContext";
+import { ObjectId } from "mongoose";
+import axios from "axios";
+import mongoose from "@/lib/mongoose";
+
+
+export type CartContextType = {
+  addToCart : (productID : ObjectId) => void;
+  cart : ObjectId[];
+  setCart : any;
+}
 
 export const Bg = styled.div`
   position: relative;
@@ -27,6 +39,7 @@ export const Description = styled.p`
 export const Wrapper = styled.div`
   align-items: center;
   display: grid;
+  justify-content: space-between;
   grid-template-columns: 1fr 1fr;
   gap: 40px;
   img {
@@ -41,11 +54,12 @@ export const Column = styled.div`
   margin: 2rem 0 0 0;
 `;
 
+
 export default function Featured({featuredProduct}:any) {
 
   const [imageUrl,setImageUrl] = useState("");
   const imageListReference = ref(storage,`${featuredProduct?.title}/`);
-
+  const {setCart} = useContext<CartContextType>(CartContext);
   useEffect(()=>{
     listAll(imageListReference).then((response:any)=>{
       if(response.items.length > 0){
@@ -63,6 +77,24 @@ export default function Featured({featuredProduct}:any) {
     }).catch((error:any)=>console.log(error));
   },[])
 
+
+  const addFeaturedProductToCart = async () => {
+      try {
+        const response = await axios.post("/api/cart" , {
+          _id:featuredProduct._id,
+          title:featuredProduct.title,
+          price:featuredProduct.price,
+          coverPhoto:imageUrl,
+          quantity:1,
+        });
+        setCart((prev:any) => [...prev , featuredProduct._id]);
+        console.log(response.data);
+      } catch (error:any) {
+        console.log(error);
+      }
+
+  }
+
   return (
     <Bg>
       <Center>
@@ -75,21 +107,8 @@ export default function Featured({featuredProduct}:any) {
               </Description>
               <Column>
                 <NeutralButton size="large">Read More</NeutralButton>
-                <PrimaryButton size="large">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth="1.5"
-                    stroke="currentColor"
-                    className="w-6 h-6"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z"
-                    />
-                  </svg>
+                <PrimaryButton size="large" onClick={addFeaturedProductToCart}>
+                  <Cart/>
                   Add to Cart
                 </PrimaryButton>
               </Column>
