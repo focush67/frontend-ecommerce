@@ -8,14 +8,27 @@ export default async function handle(request:NextApiRequest,response:NextApiResp
     mongooseConnect();
     
     if(method === "DELETE"){
-        await Cart.deleteMany({
-            quantity:0
-        });
 
-        return response.json({
-            message : "Product removed from Cart",
-            status : 201,
-        })
+        const {empty} = request.body;
+        if(empty === true){
+            await Cart.deleteMany({});
+            return response.json({
+                message : "Cart emptied",
+                status : 201,
+            });
+        }
+
+        else{
+            await Cart.deleteMany({
+                quantity:0
+            });
+    
+            return response.json({
+                message : "Product removed from Cart",
+                status : 201,
+            });
+        }
+        
     }
 
     return response.json({

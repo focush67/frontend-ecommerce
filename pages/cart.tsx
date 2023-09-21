@@ -7,53 +7,62 @@ import {
   PriceRow,
   ProductInfoBox,
   ProductWrapper,
-  Title,
   WhiteBox,
 } from "@/components/ProductBox";
 import styled from "styled-components";
 import { CartContext } from "@/components/CartContext";
-import { NeutralButton } from "@/components/Buttons";
+import PrimaryButton, { NeutralButton } from "@/components/Buttons";
+
+const Title = styled.div`
+  font-family: Georgia, "Times New Roman", Times, serif;
+  margin-top: 0.7rem;
+  margin-bottom: 0.6rem;
+`;
 
 const Quantity = styled.div`
   width: 20%;
   display: flex;
-  justify-content: center;
-  margin-top: 3px;
+  flex-direction: column;
+  align-items: center;
   font-weight: 800;
-  border: 2px solid none;
   padding: 4px;
   background-color: #aaa;
   color: #2c0b0b;
-  margin-bottom: 0;
   border-radius: 15px;
+  margin-top: 1px;
 `;
 
 const StyledButton = styled.button`
-  width: 20%;
+  width: 30px;
+  height: 30px;
   border: none;
   font-weight: 700;
   transition: transform 100ms all;
-  border-radius : 50%;
-  padding: 8px;
-  &:hover{
-    cursor: pointer;
-    transform: scale(1.1);
-  }
-  &.plus{
+  border-radius: 50%;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  &.plus {
     background-color: #2323af;
     color: white;
   }
-  &.minus{
+  &.minus {
     background-color: #ab2626;
     color: white;
   }
-`
+`;
 
+const Cluster = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+`;
 
 export default function Cart() {
   const [products, setProducts] = useState([{}]);
-
+  const [totalCost,setTotalCost] = useState(0);
   const { cart, setCart } = useContext<CartContextType>(CartContext);
+
   useEffect(() => {
     const fetchCart = async () => {
       const response = await axios.get("/api/cart");
@@ -65,7 +74,8 @@ export default function Cart() {
   }, []);
 
   const emptyCart = async () => {
-    const response = await axios.delete("/api/cart");
+    const data = {empty:true}
+    const response = await axios.delete("/api/temp",data);
     console.log(response);
     localStorage.clear();
     window.location.reload();
@@ -93,6 +103,10 @@ export default function Cart() {
           [product._id]: 1,
         }));
       }
+
+      const productCost = parseFloat(product?.price) || 0;
+      setTotalCost((prevTotalCost) => prevTotalCost + productCost);
+
     } catch (error: any) {
       console.log(error);
     }
@@ -115,26 +129,41 @@ export default function Cart() {
           [product._id]: prev[product._id] - 1,
         }));
       }
+
+      const productCost = parseFloat(product?.price) || 0;
+      setTotalCost((prevTotalCost) => prevTotalCost - productCost);
+
     } catch (error) {
       console.log(error);
     }
 
     try {
       const response = await axios.delete("/api/temp");
-    } catch (error:any) {
+    } catch (error: any) {
       console.log(error);
     }
   };
 
   const filteredProducts = products.filter((prod: any) => cart[prod?._id] > 0);
 
+  useEffect(()=>{
+    const initialTotalCost = filteredProducts.reduce((acc,prod) => acc + (parseFloat(prod?.price) || 0) * cart[prod?._id],0);
+
+    setTotalCost(initialTotalCost);
+  },[filteredProducts,cart])
+
   return (
     <>
       <Header />
-      <NeutralButton size="large" onClick={emptyCart}>Empty Cart</NeutralButton>
+      <NeutralButton size="large" onClick={emptyCart}>
+        Empty Cart
+      </NeutralButton>
+
+      <PrimaryButton size="large">${totalCost}</PrimaryButton>
       <Wrapper>
         <Column>
           <ProductsGrid>
+            
             {filteredProducts?.map((prod: any, index: number) => (
               <div key={index}>
                 <ProductWrapper>
@@ -147,18 +176,21 @@ export default function Cart() {
                   <ProductInfoBox>
                     <Title>{prod?.title}</Title>
                     <PriceRow>
-                      
-                      
-
-                       <StyledButton className="plus" onClick={() => addToCart({ product: prod })}>
-                        +
-                      </StyledButton> 
-                      <Quantity>{cart[prod?._id]}</Quantity>
-                       <StyledButton className="minus" onClick={() => removeFromCart({ product: prod })}>
-                        -
-                      </StyledButton> 
-
-                    
+                      <Cluster>
+                        <StyledButton
+                          className="plus"
+                          onClick={() => addToCart({ product: prod })}
+                        >
+                          +
+                        </StyledButton>
+                        <Quantity>{cart[prod?._id]}</Quantity>
+                        <StyledButton
+                          className="minus"
+                          onClick={() => removeFromCart({ product: prod })}
+                        >
+                          -
+                        </StyledButton>
+                      </Cluster>
                     </PriceRow>
                   </ProductInfoBox>
                 </ProductWrapper>

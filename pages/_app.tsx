@@ -1,4 +1,5 @@
 import type { AppProps } from "next/app";
+import styled from "styled-components";
 import { createGlobalStyle } from "styled-components";
 import { CartContextProvider } from "@/components/CartContext";
 const GlobalStyles = createGlobalStyle`
@@ -11,15 +12,35 @@ const GlobalStyles = createGlobalStyle`
   }
 `;
 
+const ScrollaleContainer = styled.div`
+  max-height: 100vh;
+  overflow-y: auto;
+
+  &::-webkit-scrollbar{
+    width:10px;
+  }
+
+  &::-webkit-scrollbar-thumb{
+    background-color: #888;
+    border-radius: 5px;
+  }
+
+  &::-webkit-scrollbar-track:hover{
+    background-color: #555;
+  }
+`
+
 export default function App({ Component, pageProps }: AppProps) {
   
   return (
     <>
     <time dateTime="2023-09-20" suppressHydrationWarning/>
+    <ScrollaleContainer>
       <GlobalStyles />
       <CartContextProvider>
         <Component {...pageProps} />
       </CartContextProvider>
+    </ScrollaleContainer>
     </>
   );
 }
