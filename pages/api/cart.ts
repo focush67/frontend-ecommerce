@@ -26,11 +26,11 @@ export default async function handle(
     try {
       const { _id, title, price, coverPhoto, quantity } = request.body;
       const productID = new mongoose.Types.ObjectId(_id);
-      const isThereAlready = await Cart.findOne({_id : productID});
+      const isThereAlready = await Cart.findOne({ _id: productID });
 
       if (isThereAlready) {
         await Cart.findByIdAndUpdate(
-          { _id : productID},
+          { _id: productID },
           {
             $inc: { quantity: 1 },
           }
@@ -40,7 +40,6 @@ export default async function handle(
           message: "Cart Updated",
           status: 201,
         });
-
       } else {
         await Cart.create({
           _id: productID,
@@ -60,8 +59,27 @@ export default async function handle(
     }
   }
 
+  if (method === "DELETE") {
+    try {
+      const result = await Cart.deleteMany({});
+      if (result.deletedCount > 0) {
+        return response.json({
+          message: "Cart Emptied",
+          status: 200,
+        });
+      } else {
+        return response.json({
+          message: "No entries found",
+          status: 404,
+        });
+      }
+    } catch (error: any) {
+      console.log(error.message);
+    }
+  }
+
   return response.json({
-    message: "Couldn't perform method",
+    message: "No request processed",
     status: 500,
   });
 }

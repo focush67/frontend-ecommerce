@@ -1,12 +1,13 @@
 import { Product } from "@/lib/models/ProductSchema";
 import Header from "@/components/Header";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import Featured from "@/components/Featured";
 import  mongooseConnect from "@/lib/mongoose";
 import NewProducts from "@/components/NewProducts";
 export default function Home({ featuredProduct, newProducts }: any) {
   const [latest, setLatest] = useState(newProducts);
 
+  
   useEffect(() => {
     const fetchNewProducts = async () => {
       try {

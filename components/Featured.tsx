@@ -8,8 +8,6 @@ import Cart from "./Cart";
 import { CartContext } from "./CartContext";
 import { ObjectId } from "mongoose";
 import axios from "axios";
-import mongoose from "@/lib/mongoose";
-
 
 export type CartContextType = {
   addToCart : (productID : ObjectId) => void;
@@ -92,7 +90,6 @@ export default function Featured({featuredProduct}:any) {
       } catch (error:any) {
         console.log(error);
       }
-
   }
 
   return (

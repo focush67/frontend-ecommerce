@@ -4,9 +4,9 @@ import axios from "axios";
 import { CartContext } from "./CartContext";
 import {useContext} from 'react';
 import {CartContextType} from './Featured';
-const ProductWrapper = styled.div``;
+export const ProductWrapper = styled.div``;
 
-const WhiteBox = styled.div`
+export const WhiteBox = styled.div`
   background-color: #fff;
   padding: 20px;
   height: 120px;
@@ -21,25 +21,25 @@ const WhiteBox = styled.div`
   }
 `;
 
-const Title = styled.h2`
+export const Title = styled.h2`
   font-weight: normal;
   font-size: 0.9rem;
   margin: 0;
 `;
 
-const ProductInfoBox = styled.div`
+export const ProductInfoBox = styled.div`
   text-align: center;
   margin-top: 5px;
 `;
 
-const PriceRow = styled.div`
+export const PriceRow = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-around;
   margin-top:2px;
 `;
 
-const Price = styled.div`
+export const Price = styled.div`
     font-size: 1.3rem;
     font-weight: bold;
 `
@@ -70,7 +70,7 @@ export default function ProductBox({ product, imageUrl }: any) {
     <ProductWrapper>
       <WhiteBox>
         <div>
-          <img src={imageUrl[0]} alt="image" onError={(e:any)=>e.currentTarget.src=fallBackUrl}/>
+          <img src={Array.isArray(imageUrl) ? imageUrl[0] : imageUrl} alt="image" onError={(e:any)=>e.currentTarget.src=fallBackUrl}/>
         </div>
       </WhiteBox>
 

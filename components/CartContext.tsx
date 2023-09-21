@@ -4,16 +4,23 @@ import { useState,useEffect } from "react";
 export const CartContext = createContext({});
 
 export function CartContextProvider({ children }: any) {
-  const [cart, setCart] = useState<ObjectId[]>([]);
+  const ls = typeof window !== "undefined" ? window.localStorage : null;
+
+  const defaultProducts = ls ? JSON.parse(ls?.getItem('cart')) : [];
+  const [cart, setCart] = useState(defaultProducts || []);
 
   useEffect(()=>{
-    const savedCart = JSON.parse(localStorage.getItem("cart") || "[]") as ObjectId[];
-    setCart(savedCart);
+    if(cart?.length > 0){
+      ls?.setItem('cart',JSON.stringify(cart));
+    }
+  },[cart])
+
+  useEffect(()=>{
+    if(ls && ls.getItem("cart")){
+      setCart(JSON.parse(ls.getItem('cart')));
+    }
   },[])
 
-  useEffect(()=>{
-    localStorage.setItem("cart",JSON.stringify(cart));
-  },[cart]);
 
   return (
     <CartContext.Provider value={{ cart, setCart}}>

@@ -4,17 +4,16 @@ import ProductBox from "./ProductBox";
 import {useEffect, useState,useContext} from 'react';
 import {storage} from '@/firebaseConfig';
 import {ref,listAll,getDownloadURL} from 'firebase/storage';
-import axios from "axios";
-import { CartContext } from "./CartContext";
 
-const ProductsGrid = styled.div`
+
+export const ProductsGrid = styled.div`
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 1fr;
     gap: 20px;
     
 `
 
-const Wrapper = styled.div`
+export const Wrapper = styled.div`
   display: flex;
   justify-content: center;
 `
@@ -30,7 +29,7 @@ const StyledHeader = styled.h2`
 export default function NewProducts({ newProducts }: any) {
     const [productImages,setProductImages] = useState<{[key:string] : string[]}>({});
     const [load,setLoad] = useState(true);
-    const {setCart} = useContext<CartContextType>(CartContext);
+    
     useEffect(()=>{
       if(!newProducts){
         console.log("No Products found");
@@ -63,7 +62,6 @@ export default function NewProducts({ newProducts }: any) {
       fetchImages();
     },[newProducts])
 
-    
   return (
     <>
     <StyledHeader>New Arrivals</StyledHeader>
