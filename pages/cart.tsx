@@ -3,7 +3,7 @@ import axios from "axios";
 import { useState, useEffect, useContext } from "react";
 import { CartContextType, Column } from "@/components/Featured";
 import { ProductsGrid, Wrapper } from "@/components/NewProducts";
-import ProductBox, {
+import {
   PriceRow,
   ProductInfoBox,
   ProductWrapper,
@@ -12,7 +12,10 @@ import ProductBox, {
 } from "@/components/ProductBox";
 import styled from "styled-components";
 import { CartContext } from "@/components/CartContext";
+import { NeutralButton } from "@/components/Buttons";
+
 const Quantity = styled.div`
+  width: 20%;
   display: flex;
   justify-content: center;
   margin-top: 3px;
@@ -21,12 +24,31 @@ const Quantity = styled.div`
   padding: 4px;
   background-color: #aaa;
   color: #2c0b0b;
+  margin-bottom: 0;
+  border-radius: 15px;
 `;
 
-const Price = styled.div`
-  font-size: 1.1rem;
-  font-weight: bold;
-`;
+const StyledButton = styled.button`
+  width: 20%;
+  border: none;
+  font-weight: 700;
+  transition: transform 100ms all;
+  border-radius : 50%;
+  padding: 8px;
+  &:hover{
+    cursor: pointer;
+    transform: scale(1.1);
+  }
+  &.plus{
+    background-color: #2323af;
+    color: white;
+  }
+  &.minus{
+    background-color: #ab2626;
+    color: white;
+  }
+`
+
 
 export default function Cart() {
   const [products, setProducts] = useState([{}]);
@@ -109,9 +131,9 @@ export default function Cart() {
   return (
     <>
       <Header />
+      <NeutralButton size="large" onClick={emptyCart}>Empty Cart</NeutralButton>
       <Wrapper>
         <Column>
-          <button onClick={emptyCart}>Empty Cart</button>
           <ProductsGrid>
             {filteredProducts?.map((prod: any, index: number) => (
               <div key={index}>
@@ -125,14 +147,18 @@ export default function Cart() {
                   <ProductInfoBox>
                     <Title>{prod?.title}</Title>
                     <PriceRow>
-                      <Price>${prod?.price}</Price>
-                      <Quantity>{cart[prod?._id]}</Quantity>
-                      <button onClick={() => addToCart({ product: prod })}>
+                      
+                      
+
+                       <StyledButton className="plus" onClick={() => addToCart({ product: prod })}>
                         +
-                      </button>
-                      <button onClick={() => removeFromCart({ product: prod })}>
+                      </StyledButton> 
+                      <Quantity>{cart[prod?._id]}</Quantity>
+                       <StyledButton className="minus" onClick={() => removeFromCart({ product: prod })}>
                         -
-                      </button>
+                      </StyledButton> 
+
+                    
                     </PriceRow>
                   </ProductInfoBox>
                 </ProductWrapper>

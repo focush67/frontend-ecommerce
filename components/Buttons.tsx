@@ -1,5 +1,5 @@
-import { Props } from "next/script";
 import styled, { css } from "styled-components";
+
 
 const buttonStyles = css`
   display: inline-flex;
