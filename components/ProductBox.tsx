@@ -46,7 +46,7 @@ export const Price = styled.div`
 
 export default function ProductBox({ product, imageUrl }: any) {
 
-  const {setCart} = useContext<CartContextType>(CartContext);
+  const {setCart,cart} = useContext<CartContextType>(CartContext);
   const fallBackUrl =  "https://picsum.photos/id/237/200/300";
 
   const addNewProductToCart = async () => {
@@ -59,7 +59,20 @@ export default function ProductBox({ product, imageUrl }: any) {
         quantity: 1,
       });
 
-      setCart((prev:any) => [...prev , product._id]);
+      if(cart[product._id]){
+        setCart((prev:any)=>({
+          ...prev,
+          [product._id] : prev[product._id] + 1,
+        }));
+      }
+
+      else{
+        setCart((prev:any)=>({
+          ...prev,
+          [product._id] : 1,
+        }))
+      }
+
       console.log(response.data);
     } catch (error:any) {
       console.log(error);

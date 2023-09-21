@@ -32,7 +32,7 @@ export default async function handle(
         await Cart.findByIdAndUpdate(
           { _id: productID },
           {
-            $inc: { quantity: 1 },
+            $inc: { quantity: quantity },
           }
         );
 
@@ -60,21 +60,37 @@ export default async function handle(
   }
 
   if (method === "DELETE") {
-    try {
-      const result = await Cart.deleteMany({});
-      if (result.deletedCount > 0) {
-        return response.json({
-          message: "Cart Emptied",
-          status: 200,
-        });
-      } else {
-        return response.json({
-          message: "No entries found",
-          status: 404,
-        });
+    if (request.body) {
+      const { _id, quantity } = request.body;
+
+      await Cart.findByIdAndUpdate(
+        { _id },
+        {
+          $inc: { quantity: quantity },
+        }
+      );
+
+      return response.json({
+        message: "Item decremented",
+        status: 200,
+      });
+    } else {
+      try {
+        const result = await Cart.deleteMany({});
+        if (result.deletedCount > 0) {
+          return response.json({
+            message: "Cart Emptied",
+            status: 200,
+          });
+        } else {
+          return response.json({
+            message: "No entries found",
+            status: 404,
+          });
+        }
+      } catch (error: any) {
+        console.log(error.message);
       }
-    } catch (error: any) {
-      console.log(error.message);
     }
   }
 

@@ -1,10 +1,11 @@
 import Header from "@/components/Header";
 import axios from "axios";
-import { useState, useEffect } from "react";
-import { Column } from "@/components/Featured";
+import { useState, useEffect, useContext } from "react";
+import { CartContextType, Column } from "@/components/Featured";
 import { ProductsGrid, Wrapper } from "@/components/NewProducts";
 import ProductBox, {PriceRow, ProductInfoBox, ProductWrapper, Title, WhiteBox } from "@/components/ProductBox";
 import styled from "styled-components";
+import { CartContext } from "@/components/CartContext";
 const Quantity = styled.div`
   display: flex;
   justify-content: center;
@@ -23,14 +24,14 @@ const Price = styled.div`
 
 export default function Cart() {
   const [products, setProducts] = useState([{}]);
-  const [cartData,setCartData] = useState({});
+  
+  const {cart,setCart} = useContext<CartContextType>(CartContext);
   useEffect(() => {
     const fetchCart = async () => {
       const response = await axios.get("/api/cart");
       setProducts((prev: any) => [...response.data]);
-
-      const cartDataFromStorage = JSON.parse(localStorage.getItem("cart") || "{}");
-      setCartData(cartDataFromStorage);
+    
+      console.log(cart);
     };
     fetchCart();
   }, []);
@@ -41,6 +42,61 @@ export default function Cart() {
     localStorage.clear();
     window.location.reload();
   }
+
+  const addToCart = async({product}:any) => {
+    try {
+      console.log(product);
+      const response = await axios.post("/api/cart",{
+        _id:product?._id,
+        title:product?.title,
+        price:product?.price,
+        coverPhoto:product?.coverPhoto,
+        quantity:1,
+      });
+
+      if(cart[product._id]){
+        setCart((prev:any)=>({
+          ...prev,
+          [product._id] : prev[product._id] + 1,
+        }));
+      }
+
+      else{
+        setCart((prev:any)=>({
+          ...prev,
+          [product._id] : 1,
+        }))
+      }
+
+    } catch (error:any) {
+      console.log(error);
+    }
+  }
+
+  const removeFromCart = async({product}:any) => {
+    try {
+      console.log(product);
+      if(cart[product._id] > 0){
+        const response = await axios.delete("/api/cart",{
+          data:{
+            _id : product?._id,
+            quantity:1,
+          }
+        });
+
+        if(response.status === 200){
+          setCart((prev:any)=>({
+            ...prev,
+            [product._id] : prev[product._id]-1,
+          }));
+        }
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  
 
   return (
     <>
@@ -62,9 +118,9 @@ export default function Cart() {
                     <Title>{prod?.title}</Title>
                     <PriceRow>
                       <Price>${prod?.price}</Price>
-                      <Quantity>{prod?.quantity}</Quantity>
-                      <button>+</button>
-                      <button>-</button>
+                      <Quantity>{cart[prod?._id]}</Quantity>
+                      <button onClick={()=>addToCart({product : prod})}>+</button>
+                      <button onClick={()=>removeFromCart({product : prod})}>-</button>
                     </PriceRow>
                   </ProductInfoBox>
                 </ProductWrapper>

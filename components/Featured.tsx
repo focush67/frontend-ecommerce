@@ -57,7 +57,7 @@ export default function Featured({featuredProduct}:any) {
 
   const [imageUrl,setImageUrl] = useState("");
   const imageListReference = ref(storage,`${featuredProduct?.title}/`);
-  const {setCart} = useContext<CartContextType>(CartContext);
+  const {cart,setCart} = useContext<CartContextType>(CartContext);
   useEffect(()=>{
     listAll(imageListReference).then((response:any)=>{
       if(response.items.length > 0){
@@ -85,8 +85,23 @@ export default function Featured({featuredProduct}:any) {
           coverPhoto:imageUrl,
           quantity:1,
         });
-        setCart((prev:any) => [...prev , featuredProduct._id]);
+        
+        if(cart[featuredProduct._id]){
+          setCart((prev:any)=>({
+            ...prev,
+            [featuredProduct._id] : prev[featuredProduct._id] + 1,
+          }));
+        }
+
+        else{
+          setCart((prev:any)=>({
+            ...prev,
+            [featuredProduct._id] : 1,
+          }))
+        }
+        
         console.log(response.data);
+        
       } catch (error:any) {
         console.log(error);
       }
