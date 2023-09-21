@@ -3,7 +3,13 @@ import axios from "axios";
 import { useState, useEffect, useContext } from "react";
 import { CartContextType, Column } from "@/components/Featured";
 import { ProductsGrid, Wrapper } from "@/components/NewProducts";
-import ProductBox, {PriceRow, ProductInfoBox, ProductWrapper, Title, WhiteBox } from "@/components/ProductBox";
+import ProductBox, {
+  PriceRow,
+  ProductInfoBox,
+  ProductWrapper,
+  Title,
+  WhiteBox,
+} from "@/components/ProductBox";
 import styled from "styled-components";
 import { CartContext } from "@/components/CartContext";
 const Quantity = styled.div`
@@ -15,111 +21,97 @@ const Quantity = styled.div`
   padding: 4px;
   background-color: #aaa;
   color: #2c0b0b;
-`
+`;
 
 const Price = styled.div`
   font-size: 1.1rem;
-    font-weight: bold;
-`
+  font-weight: bold;
+`;
 
 export default function Cart() {
   const [products, setProducts] = useState([{}]);
-  
-  const {cart,setCart} = useContext<CartContextType>(CartContext);
+
+  const { cart, setCart } = useContext<CartContextType>(CartContext);
   useEffect(() => {
     const fetchCart = async () => {
       const response = await axios.get("/api/cart");
       setProducts((prev: any) => [...response.data]);
-    
+
       console.log(cart);
     };
     fetchCart();
   }, []);
 
-  const emptyCart = async() => {
+  const emptyCart = async () => {
     const response = await axios.delete("/api/cart");
     console.log(response);
     localStorage.clear();
     window.location.reload();
-  }
+  };
 
-  const addToCart = async({product}:any) => {
+  const addToCart = async ({ product }: any) => {
     try {
       console.log(product);
-      const response = await axios.post("/api/cart",{
-        _id:product?._id,
-        title:product?.title,
-        price:product?.price,
-        coverPhoto:product?.coverPhoto,
-        quantity:1,
+      const response = await axios.post("/api/cart", {
+        _id: product?._id,
+        title: product?.title,
+        price: product?.price,
+        coverPhoto: product?.coverPhoto,
+        quantity: 1,
       });
 
-      if(cart[product._id]){
-        setCart((prev:any)=>({
+      if (cart[product._id]) {
+        setCart((prev: any) => ({
           ...prev,
-          [product._id] : prev[product._id] + 1,
+          [product._id]: prev[product._id] + 1,
+        }));
+      } else {
+        setCart((prev: any) => ({
+          ...prev,
+          [product._id]: 1,
         }));
       }
-
-      else{
-        setCart((prev:any)=>({
-          ...prev,
-          [product._id] : 1,
-        }))
-      }
-
-    } catch (error:any) {
+    } catch (error: any) {
       console.log(error);
     }
-  }
+  };
 
-  const removeFromCart = async({product}:any) => {
+  const removeFromCart = async ({ product }: any) => {
     try {
       console.log(product);
-      const updatedCart = {...cart};
 
-      if(cart[product._id] > 0){
-        const response = await axios.delete("/api/cart",{
-          data:{
-            _id : product?._id,
-            quantity:1,
-          }
-        });
+      const response = await axios.delete("/api/cart", {
+        data: {
+          _id: product?._id,
+          quantity: -1,
+        },
+      });
 
-        if(response.status === 200){
-          updatedCart[product._id] =- 1;
-          if(updatedCart[product._id] === 0){
-            delete updatedCart[product._id];
-          }
-
-         setCart(updatedCart);
-        }
-      }
-
-      else{
-        delete updatedCart[product._id];
-        setCart(updatedCart);
-
-        const response = await axios.delete("/api/cart",{
-          data:{
-            _id : product?._id,
-            quantity : 0,
-          }
-        });
+      if (response.status === 200) {
+        setCart((prev: any) => ({
+          ...prev,
+          [product._id]: prev[product._id] - 1,
+        }));
       }
     } catch (error) {
       console.log(error);
     }
-  }
 
-  const filteredProducts = products.filter((prod:any) => cart[prod?._id] > 0);
+    try {
+      const response = await axios.delete("/api/temp");
+    } catch (error:any) {
+      console.log(error);
+    }
+  };
+
+  const filteredProducts = products.filter((prod: any) => cart[prod?._id] > 0);
 
   return (
     <>
       <Header />
       <Wrapper>
         <Column>
-        <button onClick={emptyCart}>Empty Cart</button>
+          <button onClick={emptyCart}>Empty Cart</button>
           <ProductsGrid>
             {filteredProducts?.map((prod: any, index: number) => (
               <div key={index}>
@@ -135,8 +127,12 @@ export default function Cart() {
                     <PriceRow>
                       <Price>${prod?.price}</Price>
                       <Quantity>{cart[prod?._id]}</Quantity>
-                      <button onClick={()=>addToCart({product : prod})}>+</button>
-                      <button onClick={()=>removeFromCart({product : prod})}>-</button>
+                      <button onClick={() => addToCart({ product: prod })}>
+                        +
+                      </button>
+                      <button onClick={() => removeFromCart({ product: prod })}>
+                        -
+                      </button>
                     </PriceRow>
                   </ProductInfoBox>
                 </ProductWrapper>
