@@ -76,6 +76,8 @@ export default function Cart() {
   const removeFromCart = async({product}:any) => {
     try {
       console.log(product);
+      const updatedCart = {...cart};
+
       if(cart[product._id] > 0){
         const response = await axios.delete("/api/cart",{
           data:{
@@ -85,18 +87,32 @@ export default function Cart() {
         });
 
         if(response.status === 200){
-          setCart((prev:any)=>({
-            ...prev,
-            [product._id] : prev[product._id]-1,
-          }));
+          updatedCart[product._id] =- 1;
+          if(updatedCart[product._id] === 0){
+            delete updatedCart[product._id];
+          }
+
+         setCart(updatedCart);
         }
+      }
+
+      else{
+        delete updatedCart[product._id];
+        setCart(updatedCart);
+
+        const response = await axios.delete("/api/cart",{
+          data:{
+            _id : product?._id,
+            quantity : 0,
+          }
+        });
       }
     } catch (error) {
       console.log(error);
     }
   }
 
-  
+  const filteredProducts = products.filter((prod:any) => cart[prod?._id] > 0);
 
   return (
     <>
@@ -105,7 +121,7 @@ export default function Cart() {
         <Column>
         <button onClick={emptyCart}>Empty Cart</button>
           <ProductsGrid>
-            {products?.map((prod: any, index: number) => (
+            {filteredProducts?.map((prod: any, index: number) => (
               <div key={index}>
                 <ProductWrapper>
                   <WhiteBox>

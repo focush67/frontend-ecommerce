@@ -62,34 +62,58 @@ export default async function handle(
   if (method === "DELETE") {
     if (request.body) {
       const { _id, quantity } = request.body;
+      const productID = new mongoose.Types.ObjectId(_id);
+      const response = await Cart.findById({ _id: productID });
 
-      await Cart.findByIdAndUpdate(
-        { _id },
-        {
-          $inc: { quantity: quantity },
+      if (response) {
+        if (quantity >= response.quantity) {
+          // Product quantity is equal to or greater than the quantity to be decremented,
+          // so delete the product from the database
+          await Cart.findByIdAndDelete({ _id: productID });
+          return response.json({
+            message: "Product deleted completely",
+            status: 200,
+          });
+        } else {
+          // Decrease the product quantity
+          await Cart.findByIdAndUpdate(
+            { _id },
+            {
+              $inc: { quantity: -quantity },
+            }
+          );
+
+          return response.json({
+            message: "Item decremented",
+            status: 200,
+          });
         }
-      );
-
-      return response.json({
-        message: "Item decremented",
-        status: 200,
-      });
+      } else {
+        return response.json({
+          message: "Product not found",
+          status: 404,
+        });
+      }
     } else {
       try {
-        const result = await Cart.deleteMany({});
+        const result = await Cart.deleteMany({ quantity: 0 });
         if (result.deletedCount > 0) {
           return response.json({
-            message: "Cart Emptied",
+            message: "Products with quantity 0 deleted",
             status: 200,
           });
         } else {
           return response.json({
-            message: "No entries found",
+            message: "No products with quantity 0 found",
             status: 404,
           });
         }
       } catch (error: any) {
         console.log(error.message);
+        return response.json({
+          message: "Internal server error",
+          status: 500,
+        });
       }
     }
   }
