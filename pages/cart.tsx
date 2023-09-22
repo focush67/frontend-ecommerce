@@ -1,5 +1,6 @@
 import Header from "@/components/Header";
 import axios from "axios";
+import { useRouter } from "next/navigation";
 import { useState, useEffect, useContext } from "react";
 import { CartContextType, Column } from "@/components/Featured";
 import { ProductsGrid, Wrapper } from "@/components/NewProducts";
@@ -12,6 +13,7 @@ import {
 import styled from "styled-components";
 import { CartContext } from "@/components/CartContext";
 import PrimaryButton, { NeutralButton } from "@/components/Buttons";
+import Link from "next/link";
 
 const Title = styled.div`
   font-family: Georgia, "Times New Roman", Times, serif;
@@ -20,21 +22,22 @@ const Title = styled.div`
 `;
 
 const Quantity = styled.div`
-  width: 20%;
+  width: 1.2rem;
+  height: 1.2rem;
   display: flex;
   flex-direction: column;
   align-items: center;
-  font-weight: 800;
-  padding: 4px;
+  font-weight: 600;
+  padding: 0px;
   background-color: #aaa;
   color: #2c0b0b;
-  border-radius: 15px;
-  margin-top: 1px;
+  border-radius: 10px;
+  margin: 0;
 `;
 
 const StyledButton = styled.button`
-  width: 30px;
-  height: 30px;
+  width: 1.2rem;
+  height: 1.2rem;
   border: none;
   font-weight: 700;
   transition: transform 100ms all;
@@ -58,9 +61,45 @@ const Cluster = styled.div`
   gap: 0.7rem;
 `;
 
+const ButtonCluster = styled(Cluster)`
+  align-items: flex-start;
+`;
+
+const ProductTitle = styled(Title)`
+  max-height: 2rem;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+`;
+
+const OuterWrapper = styled.div`
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+`;
+
+const ModifiedNeutralButton = styled(NeutralButton)`
+  justify-content: center;
+  width: 20%;
+`;
+
+const ModifiedLink = styled(Link)`
+  text-decoration: none;
+  color: white;
+`;
+
+const ModifiedPrimaryButton = styled(PrimaryButton)`
+  justify-content: center;
+  background:none;
+  max-width: 200px;
+  color: black;
+  font-size: large;
+  pointer-events: none;
+  font-weight: 600;
+`
+
 export default function Cart() {
   const [products, setProducts] = useState([{}]);
-  const [totalCost,setTotalCost] = useState(0);
+  const [totalCost, setTotalCost] = useState(0);
   const { cart, setCart } = useContext<CartContextType>(CartContext);
 
   useEffect(() => {
@@ -68,15 +107,19 @@ export default function Cart() {
       const response = await axios.get("/api/cart");
       setProducts((prev: any) => [...response.data]);
 
-      console.log(cart);
+      console.log("CART FROM LOCAL ", cart);
+      console.log("CART FROM BACKEND", response.data);
     };
     fetchCart();
   }, []);
 
   const emptyCart = async () => {
-    const data = {empty:true}
-    const response = await axios.delete("/api/temp",data);
-    console.log(response);
+    const requestBody = {
+      empty: true,
+    };
+
+    const response = await axios.delete("/api/temp", { data: requestBody });
+    console.log("cart empty response", response);
     localStorage.clear();
     window.location.reload();
   };
@@ -106,7 +149,6 @@ export default function Cart() {
 
       const productCost = parseFloat(product?.price) || 0;
       setTotalCost((prevTotalCost) => prevTotalCost + productCost);
-
     } catch (error: any) {
       console.log(error);
     }
@@ -132,7 +174,6 @@ export default function Cart() {
 
       const productCost = parseFloat(product?.price) || 0;
       setTotalCost((prevTotalCost) => prevTotalCost - productCost);
-
     } catch (error) {
       console.log(error);
     }
@@ -146,59 +187,70 @@ export default function Cart() {
 
   const filteredProducts = products.filter((prod: any) => cart[prod?._id] > 0);
 
-  useEffect(()=>{
-    const initialTotalCost = filteredProducts.reduce((acc,prod) => acc + (parseFloat(prod?.price) || 0) * cart[prod?._id],0);
+  useEffect(() => {
+    const initialTotalCost = filteredProducts.reduce(
+      (acc, prod) => acc + (parseFloat(prod?.price) || 0) * cart[prod?._id],
+      0
+    );
 
     setTotalCost(initialTotalCost);
-  },[filteredProducts,cart])
+  }, [filteredProducts, cart]);
+
 
   return (
     <>
       <Header />
-      <NeutralButton size="large" onClick={emptyCart}>
-        Empty Cart
-      </NeutralButton>
+      
+        <ModifiedNeutralButton size="large" onClick={emptyCart}>
+          Empty Cart
+        </ModifiedNeutralButton>
 
-      <PrimaryButton size="large">${totalCost}</PrimaryButton>
-      <Wrapper>
-        <Column>
-          <ProductsGrid>
-            
-            {filteredProducts?.map((prod: any, index: number) => (
-              <div key={index}>
-                <ProductWrapper>
-                  <WhiteBox>
-                    <div>
-                      <img src={prod?.coverPhoto} alt="image" />
-                    </div>
-                  </WhiteBox>
+        <ModifiedNeutralButton size="large">
+          <ModifiedLink href={{
+            pathname:"/checkout",
+            search:`?totalCost=${totalCost}`,
+          }}>Checkout</ModifiedLink>
+        </ModifiedNeutralButton>
+        <Wrapper>
+          <Column>
+            <ProductsGrid>
+              {filteredProducts?.map((prod: any, index: number) => (
+                <div key={index}>
+                  <ProductWrapper>
+                    <WhiteBox>
+                      <div>
+                        <img src={prod?.coverPhoto} alt="image" />
+                      </div>
+                    </WhiteBox>
 
-                  <ProductInfoBox>
-                    <Title>{prod?.title}</Title>
-                    <PriceRow>
-                      <Cluster>
-                        <StyledButton
-                          className="plus"
-                          onClick={() => addToCart({ product: prod })}
-                        >
-                          +
-                        </StyledButton>
-                        <Quantity>{cart[prod?._id]}</Quantity>
-                        <StyledButton
-                          className="minus"
-                          onClick={() => removeFromCart({ product: prod })}
-                        >
-                          -
-                        </StyledButton>
-                      </Cluster>
-                    </PriceRow>
-                  </ProductInfoBox>
-                </ProductWrapper>
-              </div>
-            ))}
-          </ProductsGrid>
-        </Column>
-      </Wrapper>
+                    <ProductInfoBox>
+                      <ProductTitle>{prod?.title}</ProductTitle>
+                      <PriceRow>
+                        <ButtonCluster>
+                          <StyledButton
+                            className="plus"
+                            onClick={() => addToCart({ product: prod })}
+                          >
+                            +
+                          </StyledButton>
+                          <Quantity>{cart[prod?._id]}</Quantity>
+                          <StyledButton
+                            className="minus"
+                            onClick={() => removeFromCart({ product: prod })}
+                          >
+                            -
+                          </StyledButton>
+                        </ButtonCluster>
+                      </PriceRow>
+                    </ProductInfoBox>
+                  </ProductWrapper>
+                </div>
+              ))}
+            </ProductsGrid>
+          </Column>
+        </Wrapper>
+        
+      
     </>
   );
 }

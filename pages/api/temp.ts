@@ -10,6 +10,7 @@ export default async function handle(request:NextApiRequest,response:NextApiResp
     if(method === "DELETE"){
 
         const {empty} = request.body;
+        console.log(empty);
         if(empty === true){
             await Cart.deleteMany({});
             return response.json({
