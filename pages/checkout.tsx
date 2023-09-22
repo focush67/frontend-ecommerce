@@ -100,6 +100,14 @@ const CheckoutForm = () => {
     const response = await axios.post("/api/orders",formData);
 
     console.log("Response from backend",response.data);
+
+    setFormData({
+        name:"",
+        email:"",
+        phone:"",
+        address:"",
+        payment:"credit-card",
+    });
   };
 
   return (
