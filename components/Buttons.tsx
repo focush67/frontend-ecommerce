@@ -55,6 +55,7 @@ const StyledButtonNeutral = styled.button`
   background-color: #000;
   color: #f3eaea;
   border: 0.1px solid white;
+  justify-content: center;
 `;
 
 export default function PrimaryButton({ children, ...rest }: any) {

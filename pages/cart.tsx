@@ -2,11 +2,12 @@
 import React, { useContext } from "react";
 import styled from "styled-components";
 import Header from "@/components/Header";
-import { useEffect,useState } from "react";
+import { useEffect, useState } from "react";
 import { CartContextType } from "@/components/Featured";
 import { CartContext } from "@/components/CartContext";
-import Link from 'next/link';
+import { useRouter } from "next/router";
 import axios from "axios";
+import { NeutralButton } from "@/components/Buttons";
 
 const PageContainer = styled.div`
   display: flex;
@@ -42,7 +43,7 @@ const Table = styled.table`
 `;
 
 const TableHeader = styled.th`
-  background-color: #007bff;
+  background-color: #114072;
   color: #fff;
   padding: 10px;
   text-align: left;
@@ -97,188 +98,270 @@ const InputField = styled.input`
 `;
 
 const SubmitButton = styled.button`
-  background-color: #007bff;
-  color: #fff;
+  margin: 0.1rem;
   padding: 10px;
   border: none;
   border-radius: 4px;
   cursor: pointer;
+  font-size: 18px;
+  border: 1px solid blue;
+  color: blue;
+
+  &:hover {
+    background-color: blue;
+    color: white;
+  }
 `;
 
 export default function Home() {
-    const [products,setProducts] = useState([{}]);
-    const [totalCost,setTotalCost] = useState(0);
-    const {cart , setCart} = useContext<CartContextType>(CartContext);
+  const router = useRouter();
+  const [products, setProducts] = useState([{}]);
+  const [totalCost, setTotalCost] = useState(0);
+  const { cart, setCart } = useContext<CartContextType>(CartContext);
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    address: "",
+    phone: "",
+    payment: "",
+  });
 
-    useEffect(() => {
-        const fetchCart = async () => {
-          const response = await axios.get("/api/cart");
-          setProducts((prev: any) => [...response.data]);
-    
-          console.log("CART FROM LOCAL ", cart);
-          console.log("CART FROM BACKEND", response.data);
-        };
-        fetchCart();
-      }, []);
+  const handleChange = (e:any) => {
+    const {name,value} = e.target;
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
+  }
 
-      const emptyCart = async () => {
-        const requestBody = {
-          empty: true,
-        };
-    
-        const response = await axios.delete("/api/temp", { data: requestBody });
-        console.log("cart empty response", response);
-        localStorage.clear();
-        window.location.reload();
-      };
+  const handleSubmit = async(e:any) => {
+    e.preventDefault();
+    console.log("Form Data: ",formData);
 
-      const addToCart = async ({ product }: any) => {
-        try {
-          console.log(product);
-          const response = await axios.post("/api/cart", {
-            _id: product?._id,
-            title: product?.title,
-            price: product?.price,
-            coverPhoto: product?.coverPhoto,
-            quantity: 1,
-          });
-    
-          if (cart[product._id]) {
-            setCart((prev: any) => ({
-              ...prev,
-              [product._id]: prev[product._id] + 1,
-            }));
-          } else {
-            setCart((prev: any) => ({
-              ...prev,
-              [product._id]: 1,
-            }));
-          }
-    
-          const productCost = parseFloat(product?.price) || 0;
-          setTotalCost((prevTotalCost) => prevTotalCost + productCost);
-        } catch (error: any) {
-          console.log(error);
-        }
-      };
+    try{
+      const response = await axios.post("/api/orders" , {
+        ...formData,cartItems:products,
+      });
 
-      const removeFromCart = async ({ product }: any) => {
-        try {
-          console.log(product);
+      console.log(response.data);
+    }catch(error:any){
+      console.log(error);
+    }
+
+    setCart({});
+    setFormData({
+      name:"",
+      email:"",
+      address:"",
+      phone:"",
+      payment:"",
+    });
+
+    router.push("/");
     
-          const response = await axios.delete("/api/cart", {
-            data: {
-              _id: product?._id,
-              quantity: -1,
-            },
-          });
-    
-          if (response.status === 200) {
-            setCart((prev: any) => ({
-              ...prev,
-              [product._id]: prev[product._id] - 1,
-            }));
-          }
-    
-          const productCost = parseFloat(product?.price) || 0;
-          setTotalCost((prevTotalCost) => prevTotalCost - productCost);
-        } catch (error) {
-          console.log(error);
-        }
-    
-        try {
-          const response = await axios.delete("/api/temp");
-        } catch (error: any) {
-          console.log(error);
-        }
-      };
-    
-      const filteredProducts = products.filter((prod: any) => cart[prod?._id] > 0);
-    
-      useEffect(() => {
-        const initialTotalCost = filteredProducts.reduce(
-          (acc, prod) => acc + (parseFloat(prod?.price) || 0) * cart[prod?._id],
-          0
-        );
-    
-        setTotalCost(initialTotalCost);
-      }, [filteredProducts, cart]);
-    
+  }
+
+
+  useEffect(() => {
+    const fetchCart = async () => {
+      const response = await axios.get("/api/cart");
+      setProducts((prev: any) => [...response.data]);
+
+      console.log("CART FROM LOCAL ", cart);
+      console.log("CART FROM BACKEND", response.data);
+    };
+    fetchCart();
+  }, []);
+
+  const emptyCart = async () => {
+    const requestBody = {
+      empty: true,
+    };
+
+    const response = await axios.delete("/api/temp", { data: requestBody });
+    console.log("cart empty response", response);
+    localStorage.clear();
+   
+  };
+
+  const addToCart = async ({ product }: any) => {
+    try {
+      console.log(product);
+      const response = await axios.post("/api/cart", {
+        _id: product?._id,
+        title: product?.title,
+        price: product?.price,
+        coverPhoto: product?.coverPhoto,
+        quantity: 1,
+      });
+
+      if (cart[product._id]) {
+        setCart((prev: any) => ({
+          ...prev,
+          [product._id]: prev[product._id] + 1,
+        }));
+      } else {
+        setCart((prev: any) => ({
+          ...prev,
+          [product._id]: 1,
+        }));
+      }
+
+      const productCost = parseFloat(product?.price) || 0;
+      setTotalCost((prevTotalCost) => prevTotalCost + productCost);
+      
+    } catch (error: any) {
+      console.log(error);
+    }
+  };
+
+  const removeFromCart = async ({ product }: any) => {
+    try {
+      console.log(product);
+
+      const response = await axios.delete("/api/cart", {
+        data: {
+          _id: product?._id,
+          quantity: -1,
+        },
+      });
+
+      if (response.status === 200) {
+        setCart((prev: any) => ({
+          ...prev,
+          [product._id]: prev[product._id] - 1,
+        }));
+      }
+
+      const productCost = parseFloat(product?.price) || 0;
+      setTotalCost((prevTotalCost) => prevTotalCost - productCost);
+    } catch (error) {
+      console.log(error);
+    }
+
+    try {
+      const response = await axios.delete("/api/temp");
+    } catch (error: any) {
+      console.log(error);
+    }
+  };
+
+  const filteredProducts = products.filter((prod: any) => cart[prod?._id] > 0);
+
+  useEffect(() => {
+    const initialTotalCost = filteredProducts.reduce(
+      (acc, prod) => acc + (parseFloat(prod?.price) || 0) * cart[prod?._id],
+      0
+    );
+
+    setTotalCost(initialTotalCost);
+  }, [filteredProducts, cart]);
 
   return (
     <>
-    <Header/>
-    <PageContainer>
-      <TableContainer>
-        <Table>
-          <thead>
-            <tr>
-              <TableHeader>Product</TableHeader>
-              <TableHeader>Quantity</TableHeader>
-              <TableHeader>Price</TableHeader>
-            </tr>
-          </thead>
-          <tbody>
-            {
-                filteredProducts.map((prod: any, index: number) => (
-                    <TableRow key={index}>
-                      <TableCell>
-                  
-                  <div style={{ maxWidth: "100px", marginBottom: "8px" }}>
-                    <img
-                      src={prod?.coverPhoto} 
-                      alt={`Image of ${prod?.title}`} 
-                      style={{ maxWidth: "100%", height: "auto" }}
-                    />
-                  </div>
-                 
-                  <div>
-                    <div style={{ fontSize: "0.8rem", fontWeight: "bold" }}>
-                      {prod?.title}
+      <Header />
+      <PageContainer>
+        <TableContainer>
+          <Table>
+            <thead>
+              <tr>
+                <TableHeader>Product</TableHeader>
+                <TableHeader>Quantity</TableHeader>
+                <TableHeader>Price</TableHeader>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredProducts.map((prod: any, index: number) => (
+                <TableRow key={index}>
+                  <TableCell>
+                    <div style={{ maxWidth: "100px", marginBottom: "8px" }}>
+                      <img
+                        src={prod?.coverPhoto}
+                        alt={`Image of ${prod?.title}`}
+                        style={{ maxWidth: "100%", height: "auto" }}
+                      />
                     </div>
-                  </div>
-                </TableCell>
-                      <TableCell>
-                        
-                        <div>
-                          <StyledButton className="minus" onClick={() => removeFromCart({product:prod})}> - </StyledButton>
-                          <span style={{fontWeight:"600"}}>{cart[prod?._id]}</span>
-                          <StyledButton className="plus" onClick={() => addToCart(prod)}> + </StyledButton>
-                        </div>
-                      </TableCell>
-                      <TableCell>${parseFloat(prod.price) || 0}</TableCell>
-                    </TableRow>
-                  ))
-      
-            }
-          </tbody>
-        </Table>
-      </TableContainer>
-      <FormContainer>
-        <Form>
-          <InputLabel>Name</InputLabel>
-          <InputField type="text" />
 
-          <InputLabel>Address</InputLabel>
-          <InputField type="text" />
+                    <div>
+                      <div style={{ fontSize: "0.8rem", fontWeight: "bold" }}>
+                        {prod?.title}
+                      </div>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div>
+                      <StyledButton
+                        className="minus"
+                        onClick={() => removeFromCart({ product: prod })}
+                      >
+                        {" "}
+                        -{" "}
+                      </StyledButton>
+                      <span style={{ fontWeight: "600" }}>
+                        {cart[prod?._id]}
+                      </span>
+                      <StyledButton
+                        className="plus"
+                        onClick={() => addToCart({ product: prod })}
+                      >
+                        {" "}
+                        +{" "}
+                      </StyledButton>
+                    </div>
+                  </TableCell>
+                  <TableCell>${parseFloat(prod.price) || 0}</TableCell>
+                </TableRow>
+              ))}
+            </tbody>
+          </Table>
+        </TableContainer>
 
-          <InputLabel>Phone</InputLabel>
-          <InputField type="tel" />
+        <FormContainer>
+          <Form onSubmit={handleSubmit}>
+            <span
+              style={{
+                textAlign: "center",
+                fontFamily: "Georgia",
+                fontSize: "30px",
+                fontWeight: "bold",
+              }}
+            >
+              Checkout
+            </span>
+            <InputLabel>Name</InputLabel>
+            <InputField type="text" name="name" value={formData.name} onChange={handleChange} required/>
 
-          <InputLabel>ID</InputLabel>
-          <InputField type="text" />
+            <InputLabel>Email</InputLabel>
+            <InputField type="text" name="email" value={formData.email} onChange={handleChange} required/>
 
-          <InputLabel>Payment Method</InputLabel>
-          <InputField type="text" />
+            <InputLabel>Address</InputLabel>
+            <InputField type="text" name="address" value={formData.address} onChange={handleChange} required/>
 
-          <div style={{textAlign:"center"}}>
-            Bill : ${totalCost.toFixed(2)}
-          </div>
+            <InputLabel>Phone</InputLabel>
+            <InputField type="tel" name="phone" value={formData.phone} onChange={handleChange} required/>
 
-          <SubmitButton type="submit">Submit</SubmitButton>
-        </Form>
-      </FormContainer>
-    </PageContainer>
+            <InputLabel>Payment Method</InputLabel>
+            <select name="payment" defaultValue="" value={formData.payment} onChange={handleChange}>
+              <option value="" disabled>
+                Select Payment Method
+              </option>
+              <option value="creditCard">Credit Card</option>
+              <option value="paypal">PayPal</option>
+              <option value="bankTransfer">Bank Transfer</option>
+              {/* Add more payment method options as needed */}
+            </select>
+
+            <div style={{ textAlign: "center", fontWeight: "bold" }}>
+              Bill : ${totalCost.toFixed(2)}
+            </div>
+
+            <SubmitButton type="submit">Submit</SubmitButton>
+            <NeutralButton size="medium" onClick={emptyCart}>
+              Empty Cart
+            </NeutralButton>
+          </Form>
+        </FormContainer>
+      </PageContainer>
     </>
   );
 }

@@ -9,12 +9,12 @@ export default async function handle(request:NextApiRequest,response:NextApiResp
     mongooseConnect();
 
     if(method === "GET"){
-        return response.json(await Order.find());
+        return response.json(await Order.find().populate("cartItems"));
     }
 
     if(method === "POST"){
         try {
-            const {name,email,address,phone,payment} = request.body;
+            const {name,email,address,phone,payment,cartItems} = request.body;
             const orderID = new mongoose.Types.ObjectId();
 
             const isThereAlready = await Order.findOne({
@@ -31,7 +31,7 @@ export default async function handle(request:NextApiRequest,response:NextApiResp
             else{
                 await Order.create({
                     _id: orderID,
-                    name,email,address,phone,payment
+                    name,email,address,phone,payment,cartItems,
                 });
 
                 return response.json({

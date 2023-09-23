@@ -1,7 +1,7 @@
 import {Schema,model,models} from "mongoose";
 import mongoose from "mongoose";
 
-const cartSchema = new Schema({
+export const cartSchema = new Schema({
     _id : {type : mongoose.Types.ObjectId , required:true},
     title : {type : String , required:true},
     price : {type : String , required:true},
