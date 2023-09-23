@@ -144,20 +144,11 @@ export default function Home() {
       });
 
       console.log(response.data);
+      router.push("/payment");
+      
     }catch(error:any){
       console.log(error);
     }
-
-    setCart({});
-    setFormData({
-      name:"",
-      email:"",
-      address:"",
-      phone:"",
-      payment:"",
-    });
-
-    router.push("/");
     
   }
 
@@ -179,9 +170,9 @@ export default function Home() {
     };
 
     const response = await axios.delete("/api/temp", { data: requestBody });
-    console.log("cart empty response", response);
-    localStorage.clear();
-   
+    console.log("cart empty response", response); 
+    localStorage.clear(); 
+    router.push("/"); 
   };
 
   const addToCart = async ({ product }: any) => {
@@ -355,7 +346,7 @@ export default function Home() {
               Bill : ${totalCost.toFixed(2)}
             </div>
 
-            <SubmitButton type="submit">Submit</SubmitButton>
+            <SubmitButton type="submit">Continue to Payment</SubmitButton>
             <NeutralButton size="medium" onClick={emptyCart}>
               Empty Cart
             </NeutralButton>
