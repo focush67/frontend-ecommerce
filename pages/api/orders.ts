@@ -1,4 +1,3 @@
-import Cart from "@/components/Cart";
 import { Order } from "@/lib/models/OrderSchema";
 import mongooseConnect from "@/lib/mongoose";
 import mongoose from "mongoose";

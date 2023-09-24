@@ -4,7 +4,6 @@ import Center from "./Center";
 import { CartContext } from "./CartContext";
 import {useContext} from 'react';
 import { CartContextType } from "./Featured";
-
 const StyledHeader = styled.header`
   background-color: #000;
 `;
@@ -12,12 +11,14 @@ const StyledHeader = styled.header`
 const Logo = styled(Link)`
   color: #aaa;
   text-decoration: none;
+
   transition: transform 150ms ease-in;
   &:hover{
     transform: scale(1.1);
     color: #fff;
     font-weight: 500;
   }
+
 `;
 
 const Wrapper = styled.div`
@@ -34,7 +35,7 @@ const StyledNav = styled.nav`
   text-decoration: none;
 `;
 
-export default function Header() {
+export default function Header({profile}:any) {
   const {cart} = useContext<CartContextType>(CartContext);
   const totalItemsInCart = Object.values(cart).reduce((total,quantity)=>total+parseInt(quantity,10),0);
   return (
@@ -46,8 +47,8 @@ export default function Header() {
             <Logo href={"/"}>Home</Logo>
             <Logo href={"/products"}>All Products</Logo>
             <Logo href={"/categories"}>Categories</Logo>
-            <Logo href={"/account"}>Account</Logo>
             <Logo href={"/cart"}>Cart ({totalItemsInCart})</Logo>
+            <Logo href={"/account"} style={{color:`profile.name ? yellow : #aaa`}}>{profile?.name || "Account"}</Logo>
           </StyledNav>
         </Wrapper>
       </Center>

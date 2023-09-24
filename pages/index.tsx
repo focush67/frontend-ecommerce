@@ -4,9 +4,13 @@ import { useState, useEffect, useContext } from "react";
 import Featured from "@/components/Featured";
 import  mongooseConnect from "@/lib/mongoose";
 import NewProducts from "@/components/NewProducts";
+import { useSession } from "next-auth/react";
+import PrimaryButton from "@/components/Buttons";
+import {signIn} from "next-auth/react";
 export default function Home({ featuredProduct, newProducts }: any) {
-  const [latest, setLatest] = useState(newProducts);
 
+  const [latest, setLatest] = useState(newProducts);
+  const {data: session} = useSession();
   
   useEffect(() => {
     const fetchNewProducts = async () => {
@@ -25,13 +29,23 @@ export default function Home({ featuredProduct, newProducts }: any) {
     const intervalID = setInterval(fetchNewProducts, 1995000);
     return () => clearInterval(intervalID);
   }, [newProducts]);
+ 
+  if(session){
+      return (
+        <>
+        <div>
+          <Header profile={session?.user} />
+          <Featured featuredProduct={featuredProduct} />
+          <NewProducts newProducts={newProducts} />
+        </div>
+        </>
+      );
+  };
+
   return (
-    <div>
-      <Header />
-      <Featured featuredProduct={featuredProduct} />
-      <NewProducts newProducts={newProducts} />
-    </div>
-  );
+    <PrimaryButton onClick={()=>signIn()}>Sign In</PrimaryButton>
+  )
+
 }
 
 export async function getServerSideProps() {

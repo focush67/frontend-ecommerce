@@ -18,13 +18,15 @@ const PageContainer = styled.div`
 `;
 
 const TableContainer = styled.div`
-  flex: 1;
+  flex: 1.5;
   background-color: #f5f5f5;
   padding: 20px;
   border-radius: 8px;
+  max-height: 100vh;
   overflow: auto;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   max-height: 100vh;
+  position: relative;
 `;
 
 const FormContainer = styled.div`
@@ -43,10 +45,14 @@ const Table = styled.table`
 `;
 
 const TableHeader = styled.th`
-  background-color: #114072;
-  color: #fff;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  gap: 2px;
+  background-color: #fff;
+  color: #aaa;
   padding: 10px;
   text-align: left;
+  top: 0;
+  z-index: 1;
 `;
 
 const TableRow = styled.tr`
@@ -95,6 +101,7 @@ const InputField = styled.input`
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 4px;
+  margin: 0.7rem 0;
 `;
 
 const SubmitButton = styled.button`
@@ -274,7 +281,7 @@ export default function Home() {
                     </div>
 
                     <div>
-                      <div style={{ fontSize: "0.8rem", fontWeight: "bold" }}>
+                      <div style={{ fontSize: "1 rem", fontWeight: "bold" }}>
                         {prod?.title}
                       </div>
                     </div>
@@ -319,20 +326,21 @@ export default function Home() {
             >
               Checkout
             </span>
-            <InputLabel>Name</InputLabel>
-            <InputField type="text" name="name" value={formData.name} onChange={handleChange} required/>
+            
+            <InputField type="text" placeholder="Name" name="name" value={formData.name} onChange={handleChange} required/>
 
-            <InputLabel>Email</InputLabel>
-            <InputField type="text" name="email" value={formData.email} onChange={handleChange} required/>
+            
+            <InputField type="text" placeholder="Email" name="email" value={formData.email} onChange={handleChange} required/>
 
-            <InputLabel>Address</InputLabel>
-            <InputField type="text" name="address" value={formData.address} onChange={handleChange} required/>
+            
 
-            <InputLabel>Phone</InputLabel>
-            <InputField type="tel" name="phone" value={formData.phone} onChange={handleChange} required/>
+            <InputField type="text" placeholder="Address" name="address" value={formData.address} onChange={handleChange} required/>
 
-            <InputLabel>Payment Method</InputLabel>
-            <select name="payment" defaultValue="" value={formData.payment} onChange={handleChange}>
+            
+            <InputField type="tel" placeholder="Contact" name="phone" value={formData.phone} onChange={handleChange} required/>
+
+            
+            <select name="payment" defaultValue="" value={formData.payment} onChange={handleChange} style={{height:"2rem"}}>
               <option value="" disabled>
                 Select Payment Method
               </option>
