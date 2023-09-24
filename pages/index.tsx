@@ -11,7 +11,7 @@ export default function Home({ featuredProduct, newProducts }: any) {
 
   const [latest, setLatest] = useState(newProducts);
   const {data: session} = useSession();
-  
+  console.log(session);
   useEffect(() => {
     const fetchNewProducts = async () => {
       try {
@@ -43,8 +43,14 @@ export default function Home({ featuredProduct, newProducts }: any) {
   };
 
   return (
-    <PrimaryButton onClick={()=>signIn()}>Sign In</PrimaryButton>
-  )
+    <>
+    <div>
+      <Header/>
+      <Featured featuredProduct={featuredProduct} />
+      <NewProducts newProducts={newProducts} />
+    </div>
+    </>
+  );
 
 }
 

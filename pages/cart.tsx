@@ -73,9 +73,6 @@ const Form = styled.form`
   margin: 0 auto;
 `;
 
-const InputLabel = styled.label`
-  font-weight: bold;
-`;
 
 const StyledButton = styled.button`
   width: 1.2rem;
@@ -124,7 +121,7 @@ export default function Home() {
   const router = useRouter();
   const [products, setProducts] = useState([{}]);
   const [totalCost, setTotalCost] = useState(0);
-  const { cart, setCart } = useContext<CartContextType>(CartContext);
+  const { cart, setCart,clearCart } = useContext<CartContextType>(CartContext);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -133,32 +130,30 @@ export default function Home() {
     payment: "",
   });
 
-  const handleChange = (e:any) => {
-    const {name,value} = e.target;
+  const handleChange = (e: any) => {
+    const { name, value } = e.target;
     setFormData({
       ...formData,
       [name]: value,
     });
-  }
+  };
 
-  const handleSubmit = async(e:any) => {
+  const handleSubmit = async (e: any) => {
     e.preventDefault();
-    console.log("Form Data: ",formData);
+    console.log("Form Data: ", formData);
 
-    try{
-      const response = await axios.post("/api/orders" , {
-        ...formData,cartItems:products,
+    try {
+      const response = await axios.post("/api/orders", {
+        ...formData,
+        cartItems: products,
       });
 
       console.log(response.data);
       router.push("/payment");
-      
-    }catch(error:any){
+    } catch (error: any) {
       console.log(error);
     }
-    
-  }
-
+  };
 
   useEffect(() => {
     const fetchCart = async () => {
@@ -176,10 +171,18 @@ export default function Home() {
       empty: true,
     };
 
-    const response = await axios.delete("/api/temp", { data: requestBody });
-    console.log("cart empty response", response); 
-    localStorage.clear(); 
-    router.push("/"); 
+    try {
+      const response = await axios.delete("/api/temp", { data: requestBody });
+      console.log("cart empty response", response);
+      localStorage.clear();
+      clearCart();
+      setTimeout(() => {
+        router.push("/");
+      }, 3000);
+      
+    } catch (error: any) {
+      console.log(error);
+    }
   };
 
   const addToCart = async ({ product }: any) => {
@@ -207,7 +210,6 @@ export default function Home() {
 
       const productCost = parseFloat(product?.price) || 0;
       setTotalCost((prevTotalCost) => prevTotalCost + productCost);
-      
     } catch (error: any) {
       console.log(error);
     }
@@ -326,21 +328,50 @@ export default function Home() {
             >
               Checkout
             </span>
-            
-            <InputField type="text" placeholder="Name" name="name" value={formData.name} onChange={handleChange} required/>
 
-            
-            <InputField type="text" placeholder="Email" name="email" value={formData.email} onChange={handleChange} required/>
+            <InputField
+              type="text"
+              placeholder="Name"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              required
+            />
 
-            
+            <InputField
+              type="text"
+              placeholder="Email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              required
+            />
 
-            <InputField type="text" placeholder="Address" name="address" value={formData.address} onChange={handleChange} required/>
+            <InputField
+              type="text"
+              placeholder="Address"
+              name="address"
+              value={formData.address}
+              onChange={handleChange}
+              required
+            />
 
-            
-            <InputField type="tel" placeholder="Contact" name="phone" value={formData.phone} onChange={handleChange} required/>
+            <InputField
+              type="tel"
+              placeholder="Contact"
+              name="phone"
+              value={formData.phone}
+              onChange={handleChange}
+              required
+            />
 
-            
-            <select name="payment" defaultValue="" value={formData.payment} onChange={handleChange} style={{height:"2rem"}}>
+            <select
+              name="payment"
+              defaultValue=""
+              value={formData.payment}
+              onChange={handleChange}
+              style={{ height: "2rem" }}
+            >
               <option value="" disabled>
                 Select Payment Method
               </option>

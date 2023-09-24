@@ -11,6 +11,10 @@ export const options = {
         }),
     ],
 
+    session:{
+        maxAge: 5*60,
+    },
+
     secret: process.env.NEXTAUTH_SECRET,
     adapter: MongoDBAdapter(clientPromise),
 

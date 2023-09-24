@@ -13,6 +13,7 @@ export type CartContextType = {
   addToCart : (productID : ObjectId) => void;
   cart : ObjectId[];
   setCart : any;
+  clearCart: any;
 }
 
 export const Bg = styled.div`
