@@ -4,11 +4,11 @@ import PrimaryButton, { NeutralButton } from "./Buttons";
 import { ref,listAll,getDownloadURL } from "firebase/storage";
 import { storage } from "@/firebaseConfig";
 import { useEffect, useState,useContext } from "react";
-import Cart from "./Cart";
+import Cart from "./CartIcon";
 import { CartContext } from "./CartContext";
 import { ObjectId } from "mongoose";
 import axios from "axios";
-
+import {useSession} from 'next-auth/react';
 export type CartContextType = {
   addToCart : (productID : ObjectId) => void;
   cart : ObjectId[];
@@ -57,6 +57,7 @@ export const Column = styled.div`
 export default function Featured({featuredProduct}:any) {
 
   const [imageUrl,setImageUrl] = useState("");
+  const {data: session} = useSession();
   const imageListReference = ref(storage,`${featuredProduct?.title}/`);
   const {cart,setCart} = useContext<CartContextType>(CartContext);
   useEffect(()=>{
@@ -79,29 +80,39 @@ export default function Featured({featuredProduct}:any) {
 
   const addFeaturedProductToCart = async () => {
       try {
-        const response = await axios.post("/api/cart" , {
-          _id:featuredProduct._id,
-          title:featuredProduct.title,
-          price:featuredProduct.price,
-          coverPhoto:imageUrl,
-          quantity:1,
-        });
-        
-        if(cart[featuredProduct._id]){
-          setCart((prev:any)=>({
+        const cartData = {
+          name: session?.user?.name,
+          email: session?.user?.email,
+          avatar: session?.user?.image,
+          productDetails:{
+            _id: featuredProduct._id,
+            title: featuredProduct.title,
+            price: featuredProduct.price,
+            coverPhoto: imageUrl,
+            quantity: 1,
+          },
+        };
+
+        console.log("FRONTEND ",cartData);
+        const response = await axios.post("/api/cart",cartData);
+        console.log(response.data);
+        if(cartData.cartContent._id in cart)
+        {
+          setCart((prev:any) => ({
             ...prev,
-            [featuredProduct._id] : prev[featuredProduct._id] + 1,
+            [cartData.cartContent._id] : prev[cartData.cartContent._id] + 1,
           }));
         }
 
-        else{
-          setCart((prev:any)=>({
+        else
+        {
+          setCart((prev:any) => ({
             ...prev,
-            [featuredProduct._id] : 1,
-          }))
+            [cartData.cartContent._id]: 1,
+          }));
         }
+          
         
-        console.log(response.data);
         
       } catch (error:any) {
         console.log(error);

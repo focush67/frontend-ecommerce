@@ -2,6 +2,7 @@ import NextAuth from 'next-auth/next';
 import clientPromise from '../../../lib/mongodb_2';
 import GoogleProvider from "next-auth/providers/google";
 import { MongoDBAdapter } from "@auth/mongodb-adapter";
+import getUserCartData from "../../../components/GetUserCartData";
 export const options = {
     providers:[
         GoogleProvider({
@@ -12,7 +13,7 @@ export const options = {
     ],
 
     session:{
-        maxAge: 5*60,
+        maxAge: 12*60*60,
     },
 
     secret: process.env.NEXTAUTH_SECRET,
@@ -24,9 +25,6 @@ export const options = {
             redirect_url: `${process.env.NEXTAUTH_URL}/api/auth/callback/google`,
         }
     },
-
-   
-
 };
 
 export default NextAuth(options);

@@ -4,6 +4,7 @@ import axios from "axios";
 import { CartContext } from "./CartContext";
 import {useContext} from 'react';
 import {CartContextType} from './Featured';
+import {useSession} from "next-auth/react";
 export const ProductWrapper = styled.div``;
 
 export const WhiteBox = styled.div`
@@ -48,35 +49,47 @@ export default function ProductBox({ product, imageUrl }: any) {
 
   const {setCart,cart} = useContext<CartContextType>(CartContext);
   const fallBackUrl =  "https://picsum.photos/id/237/200/300";
-
+  const {data: session} = useSession();
   const addNewProductToCart = async () => {
     try {
-      const response = await axios.post("/api/cart" , {
-        _id: product._id,
-        title: product.title,
-        price: product.price,
-        coverPhoto: imageUrl[0],
-        quantity: 1,
-      });
-
-      if(cart[product._id]){
-        setCart((prev:any)=>({
-          ...prev,
-          [product._id] : prev[product._id] + 1,
-        }));
-      }
-
-      else{
-        setCart((prev:any)=>({
-          ...prev,
-          [product._id] : 1,
-        }))
-      }
-
+      const cartData = {
+        name: session?.user?.name,
+        email: session?.user?.email,
+        avatar: session?.user?.image,
+        productDetails:{
+          _id: product._id,
+          title: product.title,
+          price: product.price,
+          coverPhoto: Array.isArray(imageUrl) ? imageUrl[0] : imageUrl,
+          quantity: 1,
+        },
+      };
+  
+      console.log("FRONTEND ",cartData);
+      const response = await axios.post("/api/cart",cartData);
       console.log(response.data);
+      if(cartData.cartContent._id in cart)
+          {
+            setCart((prev:any) => ({
+              ...prev,
+              [cartData.cartContent._id] : prev[cartData.cartContent._id] + 1,
+            }));
+          }
+  
+          else
+          {
+            setCart((prev:any) => ({
+              ...prev,
+              [cartData.cartContent._id]: 1,
+            }));
+          }
+            
+          
     } catch (error:any) {
-      console.log(error);
+      console.log(error.message);
+      console.log(error.status);
     }
+        
 }
 
   return (

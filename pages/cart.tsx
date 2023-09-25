@@ -8,6 +8,7 @@ import { CartContext } from "@/components/CartContext";
 import { useRouter } from "next/router";
 import axios from "axios";
 import { NeutralButton } from "@/components/Buttons";
+import {useSession} from "next-auth/react";
 
 const PageContainer = styled.div`
   display: flex;
@@ -119,6 +120,7 @@ const SubmitButton = styled.button`
 
 export default function Home() {
   const router = useRouter();
+  const {data: session} = useSession();
   const [products, setProducts] = useState([{}]);
   const [totalCost, setTotalCost] = useState(0);
   const { cart, setCart,clearCart } = useContext<CartContextType>(CartContext);
@@ -259,7 +261,7 @@ export default function Home() {
 
   return (
     <>
-      <Header />
+      <Header profile={session?.user}/>
       <PageContainer>
         <TableContainer>
           <Table>

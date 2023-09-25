@@ -2,11 +2,10 @@ import { createContext } from "react";
 import { useState,useEffect } from "react";
 export const CartContext = createContext({});
 
-export function CartContextProvider({ children }: any) {
+export function CartContextProvider({ children,initialCart }: any) {
   const ls = typeof window !== "undefined" ? window.localStorage : null;
 
-  const defaultProducts = ls ? JSON.parse(ls?.getItem('cart')) : {};
-  const [cart, setCart] = useState(defaultProducts || {});
+  const [cart, setCart] = useState(initialCart || {});
 
   useEffect(()=>{
     if(Object.keys(cart)?.length > 0){
@@ -15,10 +14,11 @@ export function CartContextProvider({ children }: any) {
   },[cart,ls])
 
   useEffect(()=>{
-    if(ls && ls.getItem("cart")){
-      setCart(JSON.parse(ls.getItem('cart')));
+    if(ls && ls.getItem("cart") && !initialCart)
+    {
+      setCart(JSON.parse(ls.getItem("cart")));
     }
-  },[])
+  },[initialCart,ls]);
 
   const clearCart = () => {
     setCart({});
