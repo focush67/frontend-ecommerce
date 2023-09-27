@@ -68,11 +68,11 @@ export default function ProductBox({ product, imageUrl }: any) {
       console.log("FRONTEND ",cartData);
       const response = await axios.post("/api/cart",cartData);
       console.log(response.data);
-      if(cartData.cartContent._id in cart)
+      if(cartData.productDetails._id in cart)
           {
             setCart((prev:any) => ({
               ...prev,
-              [cartData.cartContent._id] : prev[cartData.cartContent._id] + 1,
+              [cartData.productDetails._id] : prev[cartData.productDetails._id] + 1,
             }));
           }
   
@@ -80,7 +80,7 @@ export default function ProductBox({ product, imageUrl }: any) {
           {
             setCart((prev:any) => ({
               ...prev,
-              [cartData.cartContent._id]: 1,
+              [cartData.productDetails._id]: 1,
             }));
           }
             

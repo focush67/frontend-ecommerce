@@ -2,30 +2,30 @@ import { createContext } from "react";
 import { useState,useEffect } from "react";
 export const CartContext = createContext({});
 
-export function CartContextProvider({ children,initialCart }: any) {
+export function CartContextProvider({ children }: any) {
   const ls = typeof window !== "undefined" ? window.localStorage : null;
 
-  const [cart, setCart] = useState(initialCart || {});
+  const defaultProducts = ls ? JSON.parse(ls?.getItem('user_cart')) : {};
+  const [cart, setCart] = useState(defaultProducts || {});
 
   useEffect(()=>{
     if(Object.keys(cart)?.length > 0){
-      ls?.setItem('cart',JSON.stringify(cart));
+      ls?.setItem('user_cart',JSON.stringify(cart));
     }
   },[cart,ls])
 
   useEffect(()=>{
-    if(ls && ls.getItem("cart") && !initialCart)
-    {
-      setCart(JSON.parse(ls.getItem("cart")));
+    if(ls && ls.getItem("user_cart")){
+      setCart(JSON.parse(ls.getItem('user_cart')));
     }
-  },[initialCart,ls]);
+  },[])
 
-  const clearCart = () => {
-    setCart({});
+
+  const clearCart = async () => {
+    ls?.clear();
   }
-
   return (
-    <CartContext.Provider value={{ cart, setCart,clearCart}}>
+    <CartContext.Provider value={{ cart, setCart, clearCart}}>
       {children}
     </CartContext.Provider>
   );

@@ -2,7 +2,7 @@ import NextAuth from 'next-auth/next';
 import clientPromise from '../../../lib/mongodb_2';
 import GoogleProvider from "next-auth/providers/google";
 import { MongoDBAdapter } from "@auth/mongodb-adapter";
-import getUserCartData from "../../../components/GetUserCartData";
+
 export const options = {
     providers:[
         GoogleProvider({

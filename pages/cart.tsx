@@ -125,8 +125,8 @@ export default function Home() {
   const [totalCost, setTotalCost] = useState(0);
   const { cart, setCart,clearCart } = useContext<CartContextType>(CartContext);
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
+    name: session?.user?.name,
+    email: session?.user?.email,
     address: "",
     phone: "",
     payment: "",
@@ -147,7 +147,7 @@ export default function Home() {
     try {
       const response = await axios.post("/api/orders", {
         ...formData,
-        cartItems: products,
+        userCart: products,
       });
 
       console.log(response.data);
@@ -159,8 +159,8 @@ export default function Home() {
 
   useEffect(() => {
     const fetchCart = async () => {
-      const response = await axios.get("/api/cart");
-      setProducts((prev: any) => [...response.data]);
+      const response = await axios.get(`/api/cart/?email=${session?.user?.email}`);
+      setProducts((prev: any) => [...response.data.userCart]);
 
       console.log("CART FROM LOCAL ", cart);
       console.log("CART FROM BACKEND", response.data);
@@ -176,7 +176,6 @@ export default function Home() {
     try {
       const response = await axios.delete("/api/temp", { data: requestBody });
       console.log("cart empty response", response);
-      localStorage.clear();
       clearCart();
       setTimeout(() => {
         router.push("/");
@@ -189,15 +188,22 @@ export default function Home() {
 
   const addToCart = async ({ product }: any) => {
     try {
-      console.log(product);
-      const response = await axios.post("/api/cart", {
-        _id: product?._id,
-        title: product?.title,
-        price: product?.price,
-        coverPhoto: product?.coverPhoto,
-        quantity: 1,
-      });
+      const cartData = {
+        name: session?.user?.name,
+        email: session?.user?.email,
+        avatar: session?.user?.avatar,
+        productDetails:{
+          _id: product._id,
+          title: product.title,
+          price: product.price,
+          coverPhoto: product.coverPhoto,
+          quantity: 1,
+        },
+      };
 
+      const response = await axios.post("/api/cart", cartData);
+      console.log(response.data.userCart);
+      
       if (cart[product._id]) {
         setCart((prev: any) => ({
           ...prev,
@@ -210,6 +216,7 @@ export default function Home() {
         }));
       }
 
+      console.log("CART: ",cart);
       const productCost = parseFloat(product?.price) || 0;
       setTotalCost((prevTotalCost) => prevTotalCost + productCost);
     } catch (error: any) {
@@ -223,16 +230,20 @@ export default function Home() {
 
       const response = await axios.delete("/api/cart", {
         data: {
+          email: session?.user?.email,
           _id: product?._id,
           quantity: -1,
         },
       });
 
       if (response.status === 200) {
-        setCart((prev: any) => ({
-          ...prev,
-          [product._id]: prev[product._id] - 1,
-        }));
+        if(cart[product._id] > 0)
+        {
+          setCart((prev: any) => ({
+            ...prev,
+            [product._id]: prev[product._id] - 1,
+          }));
+        }
       }
 
       const productCost = parseFloat(product?.price) || 0;

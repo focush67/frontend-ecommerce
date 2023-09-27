@@ -96,23 +96,20 @@ export default function Featured({featuredProduct}:any) {
         console.log("FRONTEND ",cartData);
         const response = await axios.post("/api/cart",cartData);
         console.log(response.data);
-        if(cartData.cartContent._id in cart)
-        {
-          setCart((prev:any) => ({
+        console.log("Cart ",cart);
+        if(cart[featuredProduct._id]){
+          setCart((prev:any)=>({
             ...prev,
-            [cartData.cartContent._id] : prev[cartData.cartContent._id] + 1,
+            [featuredProduct._id] : prev[featuredProduct._id] + 1,
           }));
         }
 
-        else
-        {
-          setCart((prev:any) => ({
+        else{
+          setCart((prev:any)=>({
             ...prev,
-            [cartData.cartContent._id]: 1,
-          }));
-        }
-          
-        
+            [featuredProduct._id] : 1,
+          }))
+        } 
         
       } catch (error:any) {
         console.log(error);

@@ -17,7 +17,7 @@ export default async function handle(
 
   if (method === "POST") {
     try {
-      const { name, email, address, phone, payment, cartItems } = request.body;
+      const { name, email, address, phone, payment, userCart } = request.body;
       const orderID = new mongoose.Types.ObjectId();
       const isPresent = await Order.findOne({email});
       if(isPresent)
@@ -35,7 +35,7 @@ export default async function handle(
         address,
         phone,
         payment,
-        cartItems,
+        userCart,
       });
 
       return response.json({

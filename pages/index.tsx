@@ -1,16 +1,17 @@
 import { Product } from "@/lib/models/ProductSchema";
 import Header from "@/components/Header";
-import { useState, useEffect} from "react";
+import { useState, useEffect, useContext } from "react";
 import Featured from "@/components/Featured";
-import  mongooseConnect from "@/lib/mongoose";
+import mongooseConnect from "@/lib/mongoose";
 import NewProducts from "@/components/NewProducts";
-import { useSession } from "next-auth/react";
-export default function Home({ featuredProduct, newProducts }: any) {
+import { useSession, getSession } from "next-auth/react";
+import axios from "axios";
+import { CartContext } from "@/components/CartContext";
 
+export default function Home({ featuredProduct, newProducts }: any) {
   const [latest, setLatest] = useState(newProducts);
-  const {data: session} = useSession();
-  
-  console.log("Session: ",session);
+  const { data: session } = useSession();
+  const { cart, setCart } = useContext(CartContext);
 
   useEffect(() => {
     const fetchNewProducts = async () => {
@@ -26,23 +27,59 @@ export default function Home({ featuredProduct, newProducts }: any) {
     };
 
     fetchNewProducts();
-    const intervalID = setInterval(fetchNewProducts, 1995000);
-    return () => clearInterval(intervalID);
   }, [newProducts]);
 
-      return (
-        <>
+  useEffect(() => {
+    const fetchCartData = async () => {
+      try {
+        const userSession = await getSession();
+        const response = await axios.get(
+          `/api/cart/?email=${userSession?.user?.email}`
+        );
+
+        const userCart = response.data.userCart;
+
+        for (let i = 0; i < userCart.length; i++) {
+          const currentProduct = userCart[i];
+          setCart((prev: any) => ({
+            ...prev,
+            [currentProduct._id]: userCart[i].quantity,
+          }));
+        }
+
+        console.log("CART: ",userCart);
+      } catch (error: any) {
+        console.log(error);
+      }
+    };
+
+    fetchCartData();
+  }, []);
+
+  if (session) {
+    return (
+      <>
         <div>
-          <Header profile={session?.user} />
+          <Header profile={session?.user}/>
           <Featured featuredProduct={featuredProduct} />
           <NewProducts newProducts={newProducts} />
         </div>
-        </>
-      );
-  };
+      </>
+    );
+  }
+
+  return (
+    <>
+      <div>
+        <Header />
+        <Featured featuredProduct={featuredProduct} />
+        <NewProducts newProducts={newProducts} />
+      </div>
+    </>
+  );
+}
 
 export async function getServerSideProps() {
-
   const featuredProductID = "650a38f6a3394adf83ec27af";
 
   await mongooseConnect();

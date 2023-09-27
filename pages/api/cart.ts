@@ -14,10 +14,12 @@ export default async function handle(
   // GET Request
 
   if (method === "GET") {
-    if(request.query?.id)
+    if(request.query?.email)
     {
+      console.log("Request Email: ", request.query?.email);
+      const email = request?.query?.email;
       try {
-        const cart = await Cart.findOne({_id: request.query?.id});
+        const cart = await Cart.findOne({email});
         if(!cart)
         {
           return response.json({
@@ -37,6 +39,7 @@ export default async function handle(
     }
 
     try {
+      console.log("Fetching all carts");
       const carts = await Cart.find();
       return response.json(carts);
     } catch (error:any) {
@@ -120,13 +123,13 @@ export default async function handle(
 
   if (method === "DELETE") {
   
-      const {_id,quantity} = request.body;
+      const {email,_id,quantity} = request.body;
       const productID = new mongoose.Types.ObjectId(_id);
 
       try {
-        await Cart.findOneAndUpdate({"cartContents._id" : productID},
+        await Cart.findOneAndUpdate({"userCart._id" : productID},
         {
-          $inc: {"cartContents.$.quantity": -quantity}
+          $inc: {"userCart.$.quantity": quantity}
         });
 
         return response.json({

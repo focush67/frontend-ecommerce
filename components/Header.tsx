@@ -2,10 +2,11 @@ import Link from "next/link";
 import styled from "styled-components";
 import Center from "./Center";
 import { CartContext } from "./CartContext";
-import {useContext} from 'react';
+import {useContext, useEffect} from 'react';
 import { CartContextType } from "./Featured";
 import { signIn, signOut } from "next-auth/react";
 import PrimaryButton, { NeutralButton } from "./Buttons";
+import axios from "axios";
 const StyledHeader = styled.header`
   background-color: #000;
 `;
@@ -56,9 +57,15 @@ const ProfileInfoWrapper = styled.div`
   pointer-events: ${({ signedIn }) => (signedIn ? "none" : "auto")};
 `
 
-export default function Header({profile}:any) {
-  const {cart} = useContext<CartContextType>(CartContext);
-  const totalItemsInCart = Object.values(cart).reduce((total,quantity)=>total+parseInt(quantity,10),0);
+export default function Header({profile,cartLength}:any) {
+  const {cart,clearCart} = useContext(CartContext);
+  const signOutAndClearStorage = async() => {
+    clearCart();
+    await signOut();
+  }
+
+  const totalItems = Object.values(cart).reduce((total:any,quantity:any) => total + parseInt(quantity),0);
+
   return (
     <StyledHeader>
       <Center>
@@ -68,13 +75,13 @@ export default function Header({profile}:any) {
             <Logo href={"/"}>Home</Logo>
             <Logo href={"/products"}>Products</Logo>
             <Logo href={"/categories"}>Categories</Logo>
-            <Logo href={"/cart"}>Cart ({totalItemsInCart})</Logo>
+            <Logo href={"/cart"}>Cart ({totalItems || 0})</Logo>
             {
               profile ? (
                 <ProfileInfoWrapper>
                   <ProfileInfo>
                   <Avatar src={profile.image} alt="image"/>
-                  <NeutralButton size="medium" background="white" onClick={()=>signOut()}>Logout</NeutralButton>
+                  <NeutralButton size="medium" background="white" onClick={()=>signOutAndClearStorage()}>Logout</NeutralButton>
                 </ProfileInfo>
                 </ProfileInfoWrapper>
               ):(

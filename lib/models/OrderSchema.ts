@@ -9,7 +9,7 @@ const orderSchema = new Schema({
     address :{type:String,required:true},
     phone :{type:String,required:true},
     payment :{type:String,required:true,default:"debit-card"},
-    user: [CartItems],
+    userCart: [CartItems],
 });
 
 export const Order = (models.Order || model("Order",orderSchema));
