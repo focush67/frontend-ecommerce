@@ -12,7 +12,20 @@ export default async function handle(
   mongooseConnect();
 
   if (method === "GET") {
-    return response.json(await Order.find().populate("cartItems"));
+    if(request?.query?.email)
+    {
+      console.log("Order request for email: ",request.query.email);
+      try {
+        return response.json(await Order.findOne({email: request.query.email}));
+      } catch (error:any){
+        console.log(error.message);
+        return response.json({
+          message: `${error.message}`,
+          status: error.status,
+        })
+      }
+    }
+    return response.json(await Order.find().populate("userCart"));
   }
 
   if (method === "POST") {
@@ -36,6 +49,7 @@ export default async function handle(
         phone,
         payment,
         userCart,
+        paymentStatus: "No",
       });
 
       return response.json({

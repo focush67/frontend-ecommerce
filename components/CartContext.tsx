@@ -1,31 +1,35 @@
-import { createContext } from "react";
-import { useState,useEffect } from "react";
+import { createContext, useState, useEffect } from "react";
+
 export const CartContext = createContext({});
 
-export function CartContextProvider({ children }: any) {
-  const ls = typeof window !== "undefined" ? window.localStorage : null;
-
-  const defaultProducts = ls ? JSON.parse(ls?.getItem('user_cart')) : {};
-  const [cart, setCart] = useState(defaultProducts || {});
-
-  useEffect(()=>{
-    if(Object.keys(cart)?.length > 0){
-      ls?.setItem('user_cart',JSON.stringify(cart));
+export function CartContextProvider({ children }) {
+  // Use a function to access local storage to avoid hydration issues
+  const getLocalStorage = () => {
+    if (typeof window !== "undefined") {
+      const ls = window.localStorage;
+      const defaultProducts = JSON.parse(ls.getItem("user_cart")) || {};
+      return defaultProducts;
     }
-  },[cart,ls])
+    return {};
+  };
 
-  useEffect(()=>{
-    if(ls && ls.getItem("user_cart")){
-      setCart(JSON.parse(ls.getItem('user_cart')));
+  const [cart, setCart] = useState(getLocalStorage);
+
+  useEffect(() => {
+    if (Object.keys(cart).length > 0) {
+      // Update local storage when the cart changes
+      localStorage.setItem("user_cart", JSON.stringify(cart));
     }
-  },[])
+  }, [cart]);
 
+  const clearCart = () => {
+    // Clear the cart in both state and local storage
+    setCart({});
+    localStorage.removeItem("user_cart");
+  };
 
-  const clearCart = async () => {
-    ls?.clear();
-  }
   return (
-    <CartContext.Provider value={{ cart, setCart, clearCart}}>
+    <CartContext.Provider value={{ cart, setCart, clearCart }}>
       {children}
     </CartContext.Provider>
   );

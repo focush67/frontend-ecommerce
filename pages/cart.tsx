@@ -179,7 +179,7 @@ export default function Home() {
       clearCart();
       setTimeout(() => {
         router.push("/");
-      }, 3000);
+      }, 2000);
       
     } catch (error: any) {
       console.log(error);
@@ -284,7 +284,7 @@ export default function Home() {
               </tr>
             </thead>
             <tbody>
-              {filteredProducts.map((prod: any, index: number) => (
+              {filteredProducts.length > 0 && filteredProducts.map((prod: any, index: number) => (
                 <TableRow key={index}>
                   <TableCell>
                     <div style={{ maxWidth: "100px", marginBottom: "8px" }}>
