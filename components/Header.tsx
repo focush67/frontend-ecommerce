@@ -63,7 +63,7 @@ const ProfileInfoWrapper = styled.div`
   pointer-events: ${({ signedIn }) => (signedIn ? "none" : "auto")};
 `
 
-export default function Header({ profile }) {
+export default function Header( profile:any) {
   const { cart, clearCart } = useContext(CartContext);
 
   const signOutAndClearStorage = async () => {
@@ -83,7 +83,7 @@ export default function Header({ profile }) {
             <Logo href={"/products"}>Products</Logo>
             <Logo href={"/categories"}>Categories</Logo>
             <Logo href={"/cart"} className="cart" disablePointerEvents={totalItems === 0}>Cart ({totalItems || 0})</Logo>
-            <Logo href={"/myorders"} disablePointerEvents={totalItems === 0}>Orders</Logo>
+            <Logo href={"/myorders"}>Orders</Logo>
             {profile ? (
               <ProfileInfoWrapper>
                 <ProfileInfo>

@@ -6,14 +6,13 @@ import { styled } from "styled-components";
 
 const OrdersTable = styled.table`
   width: 100%;
-  border-collapse: collapse;
 `;
 
 const TableHeader = styled.th`
   border: 1px solid #ccc;
   padding: 8px;
   text-align: left;
-  font-size: larger;
+  font-size: large;
   text-align: center;
 `;
 
@@ -24,8 +23,10 @@ const TableRow = styled.tr`
 
 const TableCell = styled.td`
   border: 2px solid #ccc;
-  padding: 1.5rem;
+  padding: 1rem;
   box-shadow: #ccc;
+  font-size: 12px;
+  font-weight: bold;
 `;
 
 const CartItemsContainer = styled.div`
@@ -38,7 +39,7 @@ const CartItemsContainer = styled.div`
 const CartItem = styled.div`
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 2px;
 `;
 
 const CartItemImage = styled.img`
@@ -79,7 +80,6 @@ export default function MyOrder() {
             <TableHeader>Name</TableHeader>
             <TableHeader>Email</TableHeader>
             <TableHeader>Items</TableHeader>
-            <TableHeader>Payment</TableHeader>
             <TableHeader>Paid</TableHeader>
           </tr>
         </thead>
@@ -100,7 +100,7 @@ export default function MyOrder() {
                   ))}
                 </CartItemsContainer>
               </TableCell>
-              <TableCell>{order.payment}</TableCell>
+              
               <TableCell>{order.paymentStatus}</TableCell>
             </TableRow>
           ))}

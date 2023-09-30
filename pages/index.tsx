@@ -71,7 +71,7 @@ export default function Home({ featuredProduct, newProducts }: any) {
   return (
     <>
       <div>
-        <Header />
+        <Header profile={null}/>
         <Featured featuredProduct={featuredProduct} />
         <NewProducts newProducts={newProducts} />
       </div>

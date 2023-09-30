@@ -1,20 +1,20 @@
 import styled from "styled-components";
 import Center from "./Center";
 import PrimaryButton, { NeutralButton } from "./Buttons";
-import { ref,listAll,getDownloadURL } from "firebase/storage";
+import { ref, listAll, getDownloadURL } from "firebase/storage";
 import { storage } from "@/firebaseConfig";
-import { useEffect, useState,useContext } from "react";
+import { useEffect, useState, useContext } from "react";
 import Cart from "./CartIcon";
 import { CartContext } from "./CartContext";
 import { ObjectId } from "mongoose";
 import axios from "axios";
-import {signIn, useSession} from 'next-auth/react';
+import { signIn, useSession } from "next-auth/react";
 export type CartContextType = {
-  addToCart : (productID : ObjectId) => void;
-  cart : ObjectId[];
-  setCart : any;
+  addToCart: (productID: ObjectId) => void;
+  cart: ObjectId[];
+  setCart: any;
   clearCart: any;
-}
+};
 
 export const Bg = styled.div`
   position: relative;
@@ -53,75 +53,68 @@ export const Column = styled.div`
   margin: 2rem 0 0 0;
 `;
 
+export default function Featured({ featuredProduct }: any) {
+  const [imageUrl, setImageUrl] = useState("");
+  const { data: session } = useSession();
+  const imageListReference = ref(storage, `${featuredProduct?.title}/`);
+  const { cart, setCart } = useContext<CartContextType>(CartContext);
+  useEffect(() => {
+    listAll(imageListReference)
+      .then((response: any) => {
+        if (response.items.length > 0) {
+          const sortedItems = response.items.sort((a: any, b: any) => {
+            const fileNameA = a.name.toLowerCase();
+            const fileNameB = b.name.toLowerCase();
+            return fileNameA.localeCompare(fileNameB);
+          });
 
-export default function Featured({featuredProduct}:any) {
-
-  const [imageUrl,setImageUrl] = useState("");
-  const {data: session} = useSession();
-  const imageListReference = ref(storage,`${featuredProduct?.title}/`);
-  const {cart,setCart} = useContext<CartContextType>(CartContext);
-  useEffect(()=>{
-    listAll(imageListReference).then((response:any)=>{
-      if(response.items.length > 0){
-        const sortedItems = response.items.sort((a:any,b:any)=>{
-          const fileNameA = a.name.toLowerCase();
-          const fileNameB = b.name.toLowerCase();
-          return fileNameA.localeCompare(fileNameB);
-        });
-
-        const firstImage = sortedItems[0];
-        getDownloadURL(firstImage).then((url)=>{
-          setImageUrl(url);
-        })
-      }
-    }).catch((error:any)=>console.log(error));
-  },[])
-
+          const firstImage = sortedItems[sortedItems.length - 1];
+          getDownloadURL(firstImage).then((url) => {
+            setImageUrl(url);
+          });
+        }
+      })
+      .catch((error: any) => console.log(error));
+  }, []);
 
   const addFeaturedProductToCart = async () => {
+    if (!session) {
+      await signIn("google");
+      return;
+    }
 
-      if(!session)
-      {
-        await signIn("google");
-        return;
+    try {
+      const cartData = {
+        name: session?.user?.name,
+        email: session?.user?.email,
+        avatar: session?.user?.image,
+        productDetails: {
+          _id: featuredProduct._id,
+          title: featuredProduct.title,
+          price: featuredProduct.price,
+          coverPhoto: imageUrl,
+          quantity: 1,
+        },
+      };
+
+      const response = await axios.post("/api/cart", cartData);
+      console.log(response.data);
+
+      if (cart[featuredProduct._id]) {
+        setCart((prev: any) => ({
+          ...prev,
+          [featuredProduct._id]: prev[featuredProduct._id] + 1,
+        }));
+      } else {
+        setCart((prev: any) => ({
+          ...prev,
+          [featuredProduct._id]: 1,
+        }));
       }
-
-
-      try {
-        const cartData = {
-          name: session?.user?.name,
-          email: session?.user?.email,
-          avatar: session?.user?.image,
-          productDetails:{
-            _id: featuredProduct._id,
-            title: featuredProduct.title,
-            price: featuredProduct.price,
-            coverPhoto: imageUrl,
-            quantity: 1,
-          },
-        };
-
-        const response = await axios.post("/api/cart",cartData);
-        console.log(response.data);
-        
-        if(cart[featuredProduct._id]){
-          setCart((prev:any)=>({
-            ...prev,
-            [featuredProduct._id] : prev[featuredProduct._id] + 1,
-          }));
-        }
-
-        else{
-          setCart((prev:any)=>({
-            ...prev,
-            [featuredProduct._id] : 1,
-          }))
-        } 
-        
-      } catch (error:any) {
-        console.log(error);
-      }
-  }
+    } catch (error: any) {
+      console.log(error);
+    }
+  };
 
   return (
     <Bg>
@@ -130,20 +123,18 @@ export default function Featured({featuredProduct}:any) {
           <Column>
             <div>
               <Title>{featuredProduct?.title}</Title>
-              <Description>
-                {featuredProduct?.description}
-              </Description>
+              <Description>{featuredProduct?.description}</Description>
               <Column>
                 <NeutralButton size="large">Read More</NeutralButton>
                 <PrimaryButton size="large" onClick={addFeaturedProductToCart}>
-                  <Cart/>
+                  <Cart />
                   Add to Cart
                 </PrimaryButton>
               </Column>
             </div>
           </Column>
           <div>
-            <img src={imageUrl} alt="photo"/>
+            <img src={imageUrl} alt="photo" />
           </div>
         </Wrapper>
       </Center>

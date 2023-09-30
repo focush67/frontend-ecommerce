@@ -1,7 +1,7 @@
 import styled from "styled-components";
-import { CartContextType, Column } from "./Featured";
+import { Column } from "./Featured";
 import ProductBox from "./ProductBox";
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState } from "react";
 import { storage } from "@/firebaseConfig";
 import { ref, listAll, getDownloadURL } from "firebase/storage";
 import { FaSpinner } from "react-icons/fa";
