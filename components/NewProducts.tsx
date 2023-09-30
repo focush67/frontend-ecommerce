@@ -2,10 +2,8 @@ import styled from "styled-components";
 import { Column } from "./Featured";
 import ProductBox from "./ProductBox";
 import { useEffect, useState } from "react";
-import { storage } from "@/firebaseConfig";
-import { ref, listAll, getDownloadURL } from "firebase/storage";
 import { FaSpinner } from "react-icons/fa";
-
+import fetchImages from "@/pages/ImageLoader";
 export const ProductsGrid = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr 1fr 1fr;
@@ -26,41 +24,27 @@ const StyledHeader = styled.h2`
 `;
 
 export default function NewProducts({ newProducts }: any) {
-  const [productImages, setProductImages] = useState<{
-    [key: string]: string[];
-  }>({});
+  
   const [load, setLoad] = useState(true);
-
+  const [images,setImages] = useState([{}]);
+  const [imagesLS,setImagesLS] = useState([{}]);
   useEffect(() => {
     if (!newProducts) {
       console.log("No Products found");
       return;
     }
+    
+    const imageFetching = async() => {
+      const imagesUrls = await fetchImages(newProducts);
+      console.log(imagesUrls);
+      setImages(imagesUrls);
+    }
 
-    const fetchImages = async () => {
-      const productImagesMap: { [key: string]: string[] } = {};
+    imageFetching();
+    setLoad(false);
 
-      for (const product of newProducts) {
-        const imageRef = ref(storage, `${product.imagesFolder}/`);
-        try {
-          const response = await listAll(imageRef);
-          const downloadPromises = response.items.map(async (item: any) => {
-            const url = await getDownloadURL(item);
-            return url;
-          });
-
-          const productImageUrls = await Promise.all(downloadPromises);
-          productImagesMap[product?.title] = productImageUrls;
-        } catch (error: any) {
-          console.log(error);
-          productImagesMap[product?.title] = [];
-        }
-      }
-      setLoad(false);
-      setProductImages(productImagesMap);
-    };
-    fetchImages();
-  }, [newProducts]);
+    setImagesLS(JSON.parse(localStorage.getItem("product_images")));
+  },[])
 
   return (
     <>
@@ -84,7 +68,7 @@ export default function NewProducts({ newProducts }: any) {
                 <ProductBox
                   key={index}
                   product={product}
-                  imageUrl={productImages[product.title]}
+                  imageUrl={imagesLS[product.title] || images[product?.title][0]}
                 />
               ))
             )}

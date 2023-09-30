@@ -7,6 +7,7 @@ import NewProducts from "@/components/NewProducts";
 import { useSession, getSession } from "next-auth/react";
 import axios from "axios";
 import { CartContext } from "@/components/CartContext";
+import fetchImages from "./ImageLoader";
 
 export default function Home({ featuredProduct, newProducts }: any) {
   const [latest, setLatest] = useState(newProducts);
@@ -27,6 +28,7 @@ export default function Home({ featuredProduct, newProducts }: any) {
     };
 
     fetchNewProducts();
+    fetchImages(newProducts);
   }, [newProducts]);
 
   useEffect(() => {

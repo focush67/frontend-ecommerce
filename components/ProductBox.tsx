@@ -5,7 +5,6 @@ import { CartContext } from "./CartContext";
 import {useContext} from 'react';
 import {CartContextType} from './Featured';
 import {signIn, useSession} from "next-auth/react";
-export const ProductWrapper = styled.div``;
 
 export const WhiteBox = styled.div`
   background-color: #fff;
@@ -100,7 +99,7 @@ export default function ProductBox({ product, imageUrl }: any) {
 }
 
   return (
-    <ProductWrapper>
+    <div>
       <WhiteBox>
         <div>
           <img src={Array.isArray(imageUrl) ? imageUrl[0] : imageUrl} alt="image" onError={(e:any)=>e.currentTarget.src=fallBackUrl}/>
@@ -116,6 +115,6 @@ export default function ProductBox({ product, imageUrl }: any) {
         </PrimaryButton>
         </PriceRow>
       </ProductInfoBox>
-    </ProductWrapper>
+      </div>
   );
 }

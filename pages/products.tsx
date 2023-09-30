@@ -57,7 +57,7 @@ const ProductDescription = styled.div`
 export default function Products() {
   const session = getSession();
   const [newProducts, setNewProducts] = useState([]);
-  const [productImages, setProductImages] = useState({});
+  const [productImages, setProductImages] = useState([{}]);
   const [load, setLoad] = useState(true);
   const router = useRouter();
   function getFirst20Words(inputString:String){
@@ -65,6 +65,7 @@ export default function Products() {
     const result = first20words?.join(" ");
     return result;
   }
+
 
   const productDetails = (product:any) => {
     router.push({
@@ -88,35 +89,12 @@ export default function Products() {
         console.error("Error fetching products:", error);
       }
     };
-
+    setLoad(false);
     fetchProducts();
+    setProductImages(JSON.parse(localStorage.getItem("product_images")));
   }, []);
 
-  useEffect(() => {
-    const fetchImages = async () => {
-      const productImagesMap = {};
-
-      for (const product of newProducts) {
-        const imageRef = ref(storage, `${product.imagesFolder}/`);
-        try {
-          const response = await listAll(imageRef);
-          const downloadPromises = response.items.map(async (item) => {
-            const url = await getDownloadURL(item);
-            return url;
-          });
-
-          const productImageUrls = await Promise.all(downloadPromises);
-          productImagesMap[product?.title] = productImageUrls;
-        } catch (error) {
-          console.error("Error fetching images:", error);
-          productImagesMap[product?.title] = [];
-        }
-      }
-      setLoad(false);
-      setProductImages(productImagesMap);
-    };
-    fetchImages();
-  }, [newProducts]);
+ 
 
   return (
     <>
