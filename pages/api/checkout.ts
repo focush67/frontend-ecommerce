@@ -1,46 +1,29 @@
-import {Stripe} from "stripe";
-import { NextApiRequest,NextApiResponse } from "next";
+import mongooseConnect from "@/lib/mongoose";
+import {NextApiRequest,NextApiResponse} from "next";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "" , {
-    apiVersion: "2023-08-16",
-});
+export default async function handle(
+    request: NextApiRequest,
+    response: NextApiResponse,
+){
+    const {method} = request;
+    mongooseConnect();
 
-export default async function handle(request:NextApiRequest , response:NextApiResponse){
-    if(request.method === "POST"){
-        try {
-            const {amount,currency,description,token} = request.body;
-            const charge = await stripe.paymentIntents.create({
-                amount,
-                currency,
-                description,
-                payment_method:token,
-                confirm:true,
-            });
-
-            if(charge.status === "succeeded"){
-                return response.json({
-                    message: "Payment successful",
-                    status: 200,
-                })
-            }
-
-            else{
-                response.json({
-                    message: "Payment Failed",
-                    status: 500,
-                })
-            }
-        } catch (error:any) {
-            console.log(error);
-            return response.json({
-                message: error.message,
-                status : 500,
-            })
-        }
+    if(method !== "POST")
+    {
+        return response.json({
+            message: "Should be a POST request",
+            status: 401,
+        })
     }
 
     else{
-        return response.status(405).end();
+        const {checkoutData , paymentMethod} = request.body;
+        console.log("CHECKOUT: ",checkoutData);
+        console.log("PAYMENT METHOD: ",paymentMethod);
+
+        return response.json({
+            message: "CHECOUT DATA RECEIVED",
+            status: 200,
+        })
     }
 }
-

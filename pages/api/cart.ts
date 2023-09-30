@@ -1,7 +1,8 @@
-import { Cart, CartItems } from "@/lib/models/CartSchema";
+import { Cart } from "@/lib/models/CartSchema";
 import mongooseConnect from "@/lib/mongoose";
 import mongoose from "mongoose";
 import { NextApiResponse, NextApiRequest } from "next";
+import { getSession } from "next-auth/react";
 
 export default async function handle(
   request: NextApiRequest,
@@ -11,6 +12,15 @@ export default async function handle(
   mongooseConnect();
   console.log("Cart Online");
 
+  const session = getSession();
+  if(!session)
+  {
+    return response.json({
+      message: "Authentication Required",
+      status: 304,
+    });
+  }
+  
   // GET Request
 
   if (method === "GET") {
@@ -54,19 +64,25 @@ export default async function handle(
   // POST Request
 
   if (method === "POST") {
+
     try {
       const {name,email,avatar,productDetails} = request.body;
-      console.log("BACKEND ",request.body);
       const productID = new mongoose.Types.ObjectId();
       const isThereAlready = await Cart.findOne({email});
-      console.log("CHECKING ",isThereAlready);
       if(isThereAlready)
       {
         const existingCartItem = isThereAlready.userCart.find((item:any)=>item._id.equals(productDetails._id));
         if(existingCartItem)
         {
-          console.log("Item ",existingCartItem);
-          existingCartItem.quantity += 1;
+          const index = isThereAlready.userCart.findIndex((item:any) => item._id.equals(productDetails._id));
+          if(index !== -1)
+          {
+            await Cart.updateOne({
+              email,"userCart._id": productDetails._id,
+            },{
+              $inc: {"userCart.$.quantity": productDetails.quantity}
+            });
+          }
         }
 
         else
@@ -81,7 +97,7 @@ export default async function handle(
         }
 
         await isThereAlready.save();
-        console.log("AFTER SAVING ",isThereAlready);
+        
         return response.json({
           message: "Cart updated",
           status: 201,
@@ -96,7 +112,7 @@ export default async function handle(
           name,
           email,
           avatar,
-          cartContents:[
+          userCart:[
             {
               _id: productDetails._id,
               title: productDetails.title,

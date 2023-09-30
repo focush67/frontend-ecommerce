@@ -8,7 +8,7 @@ import Cart from "./CartIcon";
 import { CartContext } from "./CartContext";
 import { ObjectId } from "mongoose";
 import axios from "axios";
-import {useSession} from 'next-auth/react';
+import {signIn, useSession} from 'next-auth/react';
 export type CartContextType = {
   addToCart : (productID : ObjectId) => void;
   cart : ObjectId[];
@@ -79,6 +79,14 @@ export default function Featured({featuredProduct}:any) {
 
 
   const addFeaturedProductToCart = async () => {
+
+      if(!session)
+      {
+        await signIn("google");
+        return;
+      }
+
+
       try {
         const cartData = {
           name: session?.user?.name,
@@ -93,10 +101,9 @@ export default function Featured({featuredProduct}:any) {
           },
         };
 
-        console.log("FRONTEND ",cartData);
         const response = await axios.post("/api/cart",cartData);
         console.log(response.data);
-        console.log("Cart ",cart);
+        
         if(cart[featuredProduct._id]){
           setCart((prev:any)=>({
             ...prev,

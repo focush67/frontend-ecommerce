@@ -4,7 +4,7 @@ import axios from "axios";
 import { CartContext } from "./CartContext";
 import {useContext} from 'react';
 import {CartContextType} from './Featured';
-import {useSession} from "next-auth/react";
+import {signIn, useSession} from "next-auth/react";
 export const ProductWrapper = styled.div``;
 
 export const WhiteBox = styled.div`
@@ -51,6 +51,13 @@ export default function ProductBox({ product, imageUrl }: any) {
   const fallBackUrl =  "https://picsum.photos/id/237/200/300";
   const {data: session} = useSession();
   const addNewProductToCart = async () => {
+
+    if(!session)
+    {
+      await signIn("google");
+      return;
+    }
+
     try {
       const cartData = {
         name: session?.user?.name,

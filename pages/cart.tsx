@@ -8,7 +8,7 @@ import { CartContext } from "@/components/CartContext";
 import { useRouter } from "next/router";
 import axios from "axios";
 import { NeutralButton } from "@/components/Buttons";
-import {useSession} from "next-auth/react";
+import { useSession } from "next-auth/react";
 
 const PageContainer = styled.div`
   display: flex;
@@ -74,7 +74,6 @@ const Form = styled.form`
   margin: 0 auto;
 `;
 
-
 const StyledButton = styled.button`
   width: 1.2rem;
   height: 1.2rem;
@@ -120,10 +119,10 @@ const SubmitButton = styled.button`
 
 export default function Home() {
   const router = useRouter();
-  const {data: session} = useSession();
+  const { data: session } = useSession();
   const [products, setProducts] = useState([{}]);
   const [totalCost, setTotalCost] = useState(0);
-  const { cart, setCart,clearCart } = useContext<CartContextType>(CartContext);
+  const { cart, setCart, clearCart } = useContext<CartContextType>(CartContext);
   const [formData, setFormData] = useState({
     name: session?.user?.name,
     email: session?.user?.email,
@@ -132,6 +131,8 @@ export default function Home() {
     payment: "",
   });
 
+  let checkoutDetails:[{}] = [{}];
+
   const handleChange = (e: any) => {
     const { name, value } = e.target;
     setFormData({
@@ -139,6 +140,7 @@ export default function Home() {
       [name]: value,
     });
   };
+
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
@@ -151,15 +153,38 @@ export default function Home() {
       });
 
       console.log(response.data);
-      router.push("/payment");
+      console.log(products);
+      
+      for(let i=0;i<products.length;i++)
+      {
+        const product:{_id:String;quantity:number;price:number} = products[i];
+        const checkoutData = {
+          productID: product?._id,
+          quantity: product?.quantity,
+          price: product?.price,
+          totalPrice: product?.price * product?.quantity,
+        }
+        checkoutDetails.push(checkoutData);
+      }
+      console.log(checkoutDetails);
+      await emptyCart();
+      localStorage.clear("user_cart");
+      //router.push("/payment");
     } catch (error: any) {
       console.log(error);
     }
   };
 
   useEffect(() => {
+    if(!session)
+    {
+      return;
+    }
+    
     const fetchCart = async () => {
-      const response = await axios.get(`/api/cart/?email=${session?.user?.email}`);
+      const response = await axios.get(
+        `/api/cart/?email=${session?.user?.email}`
+      );
       setProducts((prev: any) => [...response.data.userCart]);
 
       console.log("CART FROM LOCAL ", cart);
@@ -180,7 +205,6 @@ export default function Home() {
       setTimeout(() => {
         router.push("/");
       }, 2000);
-      
     } catch (error: any) {
       console.log(error);
     }
@@ -192,7 +216,7 @@ export default function Home() {
         name: session?.user?.name,
         email: session?.user?.email,
         avatar: session?.user?.avatar,
-        productDetails:{
+        productDetails: {
           _id: product._id,
           title: product.title,
           price: product.price,
@@ -202,8 +226,8 @@ export default function Home() {
       };
 
       const response = await axios.post("/api/cart", cartData);
-      console.log(response.data.userCart);
-      
+      console.log(response.data);
+
       if (cart[product._id]) {
         setCart((prev: any) => ({
           ...prev,
@@ -215,8 +239,7 @@ export default function Home() {
           [product._id]: 1,
         }));
       }
-
-      console.log("CART: ",cart);
+      
       const productCost = parseFloat(product?.price) || 0;
       setTotalCost((prevTotalCost) => prevTotalCost + productCost);
     } catch (error: any) {
@@ -237,8 +260,7 @@ export default function Home() {
       });
 
       if (response.status === 200) {
-        if(cart[product._id] > 0)
-        {
+        if (cart[product._id] > 0) {
           setCart((prev: any) => ({
             ...prev,
             [product._id]: prev[product._id] - 1,
@@ -272,7 +294,7 @@ export default function Home() {
 
   return (
     <>
-      <Header profile={session?.user}/>
+      <Header profile={session?.user} />
       <PageContainer>
         <TableContainer>
           <Table>
@@ -284,47 +306,48 @@ export default function Home() {
               </tr>
             </thead>
             <tbody>
-              {filteredProducts.length > 0 && filteredProducts.map((prod: any, index: number) => (
-                <TableRow key={index}>
-                  <TableCell>
-                    <div style={{ maxWidth: "100px", marginBottom: "8px" }}>
-                      <img
-                        src={prod?.coverPhoto}
-                        alt={`Image of ${prod?.title}`}
-                        style={{ maxWidth: "100%", height: "auto" }}
-                      />
-                    </div>
-
-                    <div>
-                      <div style={{ fontSize: "1 rem", fontWeight: "bold" }}>
-                        {prod?.title}
+              {filteredProducts.length > 0 &&
+                filteredProducts.map((prod: any, index: number) => (
+                  <TableRow key={index}>
+                    <TableCell>
+                      <div style={{ maxWidth: "100px", marginBottom: "8px" }}>
+                        <img
+                          src={prod?.coverPhoto}
+                          alt={`Image of ${prod?.title}`}
+                          style={{ maxWidth: "100%", height: "auto" }}
+                        />
                       </div>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div>
-                      <StyledButton
-                        className="minus"
-                        onClick={() => removeFromCart({ product: prod })}
-                      >
-                        {" "}
-                        -{" "}
-                      </StyledButton>
-                      <span style={{ fontWeight: "600" }}>
-                        {cart[prod?._id]}
-                      </span>
-                      <StyledButton
-                        className="plus"
-                        onClick={() => addToCart({ product: prod })}
-                      >
-                        {" "}
-                        +{" "}
-                      </StyledButton>
-                    </div>
-                  </TableCell>
-                  <TableCell>${parseFloat(prod.price) || 0}</TableCell>
-                </TableRow>
-              ))}
+
+                      <div>
+                        <div style={{ fontSize: "1 rem", fontWeight: "bold" }}>
+                          {prod?.title}
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div>
+                        <StyledButton
+                          className="minus"
+                          onClick={() => removeFromCart({ product: prod })}
+                        >
+                          {" "}
+                          -{" "}
+                        </StyledButton>
+                        <span style={{ fontWeight: "600" }}>
+                          {cart[prod?._id]}
+                        </span>
+                        <StyledButton
+                          className="plus"
+                          onClick={() => addToCart({ product: prod })}
+                        >
+                          {" "}
+                          +{" "}
+                        </StyledButton>
+                      </div>
+                    </TableCell>
+                    <TableCell>${parseFloat(prod.price) || 0}</TableCell>
+                  </TableRow>
+                ))}
             </tbody>
           </Table>
         </TableContainer>

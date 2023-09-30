@@ -16,7 +16,7 @@ export default async function handle(
     {
       console.log("Order request for email: ",request.query.email);
       try {
-        return response.json(await Order.findOne({email: request.query.email}));
+        return response.json(await Order.find({email: request.query.email}));
       } catch (error:any){
         console.log(error.message);
         return response.json({
@@ -32,14 +32,6 @@ export default async function handle(
     try {
       const { name, email, address, phone, payment, userCart } = request.body;
       const orderID = new mongoose.Types.ObjectId();
-      const isPresent = await Order.findOne({email});
-      if(isPresent)
-      {
-        return response.json({
-            message: "Use a different email",
-            status: 302,            
-        });
-      }
 
       await Order.create({
         _id: orderID,
