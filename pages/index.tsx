@@ -38,7 +38,8 @@ export default function Home({ featuredProduct, newProducts }: any) {
         const response = await axios.get(
           `/api/cart/?email=${userSession?.user?.email}`
         );
-
+        
+        console.log("User Session: ",userSession);
         const userCart = response.data.userCart;
 
         for (let i = 0; i < userCart.length; i++) {
@@ -61,22 +62,18 @@ export default function Home({ featuredProduct, newProducts }: any) {
   if (session) {
     return (
       <>
-        <div>
           <Header profile={session?.user}/>
           <Featured featuredProduct={featuredProduct} />
           <NewProducts newProducts={newProducts} />
-        </div>
       </>
     );
   }
 
   return (
     <>
-      <div>
         <Header profile={null}/>
         <Featured featuredProduct={featuredProduct} />
         <NewProducts newProducts={newProducts} />
-      </div>
     </>
   );
 }
