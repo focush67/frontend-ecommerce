@@ -44,10 +44,7 @@ const StyledButtonPrimary = styled.button`
   background-color: ${props => props.background === "white" ? "transparent" : props.background};
   border: ${props => props.background === "white" ? "2px solid blue" : "none"};
   color:${props => props.background === "white" ? "blue" : "white"};
-  &:hover{
-    background-color: ${props => props.background === "white" ? "blue" : "white"};
-    color:${props => props.background === "white" ? "#fff" : "blue"}
-  }
+  
 `;
 
 const StyledButtonNeutral = styled.button`

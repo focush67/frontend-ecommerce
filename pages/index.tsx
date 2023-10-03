@@ -39,7 +39,7 @@ export default function Home({ featuredProduct, newProducts }: any) {
           `/api/cart/?email=${userSession?.user?.email}`
         );
         
-        console.log("User Session: ",userSession);
+        //console.log("User Session: ",userSession);
         const userCart = response.data.userCart;
 
         for (let i = 0; i < userCart.length; i++) {
@@ -50,7 +50,7 @@ export default function Home({ featuredProduct, newProducts }: any) {
           }));
         }
 
-        console.log("CART: ",userCart);
+        //console.log("CART: ",userCart);
       } catch (error: any) {
         console.log(error);
       }

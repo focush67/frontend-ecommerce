@@ -9,6 +9,11 @@ import { useRouter } from "next/router";
 import axios from "axios";
 import { NeutralButton } from "@/components/Buttons";
 import { useSession } from "next-auth/react";
+import { loadStripe } from "@stripe/stripe-js";
+
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY || " ");
+
+
 
 const PageContainer = styled.div`
   display: flex;
@@ -131,8 +136,6 @@ export default function Home() {
     payment: "",
   });
 
-  let checkoutDetails:[{}] = [{}];
-
   const handleChange = (e: any) => {
     const { name, value } = e.target;
     setFormData({
@@ -147,6 +150,21 @@ export default function Home() {
     console.log("Form Data: ", formData);
 
     try {
+
+      const stripeResponse = await axios.post("/api/stripe",{
+        formData,
+        userCart: products,
+      });
+
+      console.log("SESSION: ",stripeResponse.data.session.url);
+      
+      const lineItems = products.map((prod:any)=>({
+        price: (prod.price*100).toFixed(0),
+        quantity: prod.quantity,
+      }));
+      
+      router.push(stripeResponse.data.session.url);
+
       const response = await axios.post("/api/orders", {
         ...formData,
         userCart: products,
@@ -154,24 +172,12 @@ export default function Home() {
 
       console.log(response.data);
       console.log(products);
-      
-      for(let i=0;i<products.length;i++)
-      {
-        const product:{_id:String;quantity:number;price:number} = products[i];
-        const checkoutData = {
-          productID: product?._id,
-          quantity: product?.quantity,
-          price: product?.price,
-          totalPrice: product?.price * product?.quantity,
-        }
-        checkoutDetails.push(checkoutData);
-      }
-      console.log(checkoutDetails);
+
       await emptyCart();
-      localStorage.clear("user_cart");
-      //router.push("/payment");
+      
+      
     } catch (error: any) {
-      console.log(error);
+      console.log("Line 195 ",error);
     }
   };
 
@@ -345,7 +351,7 @@ export default function Home() {
                         </StyledButton>
                       </div>
                     </TableCell>
-                    <TableCell>${parseFloat(prod.price) || 0}</TableCell>
+                    <TableCell><svg xmlns="http://www.w3.org/2000/svg" height="0.8rem" viewBox="0 0 320 512"><path d="M308 96c6.627 0 12-5.373 12-12V44c0-6.627-5.373-12-12-12H12C5.373 32 0 37.373 0 44v44.748c0 6.627 5.373 12 12 12h85.28c27.308 0 48.261 9.958 60.97 27.252H12c-6.627 0-12 5.373-12 12v40c0 6.627 5.373 12 12 12h158.757c-6.217 36.086-32.961 58.632-74.757 58.632H12c-6.627 0-12 5.373-12 12v53.012c0 3.349 1.4 6.546 3.861 8.818l165.052 152.356a12.001 12.001 0 0 0 8.139 3.182h82.562c10.924 0 16.166-13.408 8.139-20.818L116.871 319.906c76.499-2.34 131.144-53.395 138.318-127.906H308c6.627 0 12-5.373 12-12v-40c0-6.627-5.373-12-12-12h-58.69c-3.486-11.541-8.28-22.246-14.252-32H308z"/></svg>{parseFloat(prod.price) || 0}</TableCell>
                   </TableRow>
                 ))}
             </tbody>
@@ -418,7 +424,7 @@ export default function Home() {
             </select>
 
             <div style={{ textAlign: "center", fontWeight: "bold" }}>
-              Bill : ${totalCost.toFixed(2)}
+              Bill : <svg xmlns="http://www.w3.org/2000/svg" height="0.9rem" viewBox="0 0 320 512"><path d="M308 96c6.627 0 12-5.373 12-12V44c0-6.627-5.373-12-12-12H12C5.373 32 0 37.373 0 44v44.748c0 6.627 5.373 12 12 12h85.28c27.308 0 48.261 9.958 60.97 27.252H12c-6.627 0-12 5.373-12 12v40c0 6.627 5.373 12 12 12h158.757c-6.217 36.086-32.961 58.632-74.757 58.632H12c-6.627 0-12 5.373-12 12v53.012c0 3.349 1.4 6.546 3.861 8.818l165.052 152.356a12.001 12.001 0 0 0 8.139 3.182h82.562c10.924 0 16.166-13.408 8.139-20.818L116.871 319.906c76.499-2.34 131.144-53.395 138.318-127.906H308c6.627 0 12-5.373 12-12v-40c0-6.627-5.373-12-12-12h-58.69c-3.486-11.541-8.28-22.246-14.252-32H308z"/></svg>{totalCost.toFixed(2)}
             </div>
 
             <SubmitButton type="submit">Continue to Payment</SubmitButton>

@@ -73,7 +73,6 @@ const ProfileInfoWrapper = styled.div`
 
 export default function Header({profile}:any) {
   const { cart, clearCart } = useContext(CartContext);
-  console.log("Profile received at header component: ", profile);
   const signOutAndClearStorage = async () => {
     clearCart();
     await signOut();

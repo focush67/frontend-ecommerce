@@ -21,7 +21,7 @@ export const Card = ({ title, description , price , imgUrl }: any) => {
           <CardTextBody>
             {description}
           </CardTextBody>
-          <CardTextTitle>${price}</CardTextTitle>
+          <CardTextTitle>{price}</CardTextTitle>
         </CardTextWrapper>
         <CardStatWrapper>
           
