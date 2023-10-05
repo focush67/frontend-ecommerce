@@ -10,7 +10,6 @@ import axios from "axios";
 import { NeutralButton } from "@/components/Buttons";
 import { useSession } from "next-auth/react";
 import { loadStripe } from "@stripe/stripe-js";
-
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY || " ");
 
 
@@ -133,7 +132,7 @@ export default function Home() {
     email: session?.user?.email,
     address: "",
     phone: "",
-    payment: "",
+    payment: "Yes",
   });
 
   const handleChange = (e: any) => {
@@ -145,10 +144,30 @@ export default function Home() {
   };
 
 
+  const getPriceIdByStripeProductId = async(stripeProductId: string) => {
+    try {
+      const stripe = require("stripe")(process.env.NEXT_PUBLIC_STRIPE_PRIVATE_KEY);
+      const pricesList = await stripe.prices.list({
+        product: stripeProductId,
+      });
+
+      if(pricesList.data && pricesList.data.length > 0){
+        return pricesList.data[0].id;
+      }
+      else{
+        throw new Error("No prices found for product");
+      }
+
+    } catch (error:any){
+      console.log(error);
+    }
+  }
+
+
   const handleSubmit = async (e: any) => {
     e.preventDefault();
     console.log("Form Data: ", formData);
-
+    const stripe = await stripePromise;
     try {
 
       const stripeResponse = await axios.post("/api/stripe",{
@@ -158,26 +177,47 @@ export default function Home() {
 
       console.log("SESSION: ",stripeResponse.data.session.url);
       
-      const lineItems = products.map((prod:any)=>({
-        price: (prod.price*100).toFixed(0),
-        quantity: prod.quantity,
-      }));
-      
-      router.push(stripeResponse.data.session.url);
+      const lineItems = await Promise.all(products.map(async (prod:any) => {
+        console.log(prod.stripeID);
+        const priceId = await getPriceIdByStripeProductId(prod.stripeID);
+        return{
+          price: priceId,
+          quantity: prod.quantity,
+        }
+      }))
+
+      console.log("Lineitems: ",lineItems);
 
       const response = await axios.post("/api/orders", {
         ...formData,
         userCart: products,
       });
 
-      console.log(response.data);
-      console.log(products);
 
       await emptyCart();
+
+      const {sessionId} = stripeResponse.data.session;
+      const {error} = await stripe?.redirectToCheckout({
+        sessionId,
+        lineItems,
+        successUrl: "http://localhost:3001/myorders",
+        cancelUrl: "http://localhost:3001/cancel",
+        mode: "payment",
+      })
+
+
+      if(error){
+        console.log("Error frontend: ",error);
+      }
+
+      else{
+        localStorage.clear("user_cart");
+      }
+
       
       
     } catch (error: any) {
-      console.log("Line 195 ",error);
+      console.log("Error from frontend ",error);
     }
   };
 
@@ -192,7 +232,7 @@ export default function Home() {
         `/api/cart/?email=${session?.user?.email}`
       );
       setProducts((prev: any) => [...response.data.userCart]);
-
+        
       console.log("CART FROM LOCAL ", cart);
       console.log("CART FROM BACKEND", response.data);
     };
@@ -297,6 +337,8 @@ export default function Home() {
 
     setTotalCost(initialTotalCost);
   }, [filteredProducts, cart]);
+
+
 
   return (
     <>
@@ -418,8 +460,8 @@ export default function Home() {
                 Select Payment Method
               </option>
               <option value="creditCard">Credit Card</option>
-              <option value="paypal">PayPal</option>
-              <option value="bankTransfer">Bank Transfer</option>
+              <option value="debitCard">Debit Card</option>
+              
               {/* Add more payment method options as needed */}
             </select>
 

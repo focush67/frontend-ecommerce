@@ -30,7 +30,7 @@ export default async function handle(
 
   if (method === "POST") {
     try {
-      const { name, email, address, phone, payment, userCart } = request.body;
+      const { name, email, address, phone, payment, userCart,amount } = request.body;
       const orderID = new mongoose.Types.ObjectId();
 
       await Order.create({
@@ -41,7 +41,7 @@ export default async function handle(
         phone,
         payment,
         userCart,
-        paymentStatus: "No",
+        amount,
       });
 
       return response.json({

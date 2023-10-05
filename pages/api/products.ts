@@ -10,9 +10,9 @@ export default async function handle(request: any, response: any) {
   if (method === "GET") {
     console.log("INSIDE GET");
     if (request.query?.id) {
-      response.json(await Product.findOne({ _id: request.query?.id }));
+      return response.json(await Product.findOne({ _id: request.query?.id }));
     }
-    response.json(await Product.find());
+    return response.json(await Product.find());
   }
 
 }

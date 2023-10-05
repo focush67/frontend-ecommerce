@@ -36,7 +36,7 @@ export default function NewProducts({ newProducts }: any) {
     
     const imageFetching = async() => {
       const imagesUrls = await fetchImages(newProducts);
-      console.log(imagesUrls);
+      //console.log(imagesUrls);
       setImages(imagesUrls);
     }
 

@@ -94,6 +94,7 @@ export default function Featured({ featuredProduct }: any) {
           price: featuredProduct.price,
           coverPhoto: imageUrl,
           quantity: 1,
+          stripeID: featuredProduct.stripeID,
         },
       };
 

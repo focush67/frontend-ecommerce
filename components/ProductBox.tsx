@@ -74,6 +74,7 @@ export default function ProductBox({ product, imageUrl }: any) {
           price: product.price,
           coverPhoto: Array.isArray(imageUrl) ? imageUrl[0] : imageUrl,
           quantity: 1,
+          stripeID: product.stripeID,
         },
       };
   

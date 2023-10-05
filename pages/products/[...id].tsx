@@ -43,7 +43,6 @@ export default function ProductDetails(){
 
     return(
         <div>
-           
             <CardContainer>
                 <Card title={product.title} description={product?.description} price={product?.price} imgUrl={imageUrl}/>
                 <Separator/>

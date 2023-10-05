@@ -7,6 +7,7 @@ export const CartItems = new Schema({
     price : {type : String , required:true},
     coverPhoto : {type : String , required:true},
     quantity : {type : Number , required : true},
+    stripeID: {type: String, required: true},
 })
 
 const CartSchema = new Schema({
