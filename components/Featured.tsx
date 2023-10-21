@@ -9,7 +9,7 @@ import { CartContext } from "./CartContext";
 import { ObjectId } from "mongoose";
 import axios from "axios";
 import { signIn, useSession } from "next-auth/react";
-import { MouseEvent } from "react";
+import Image from "next/image";
 export type CartContextType = {
   addToCart: (productID: ObjectId) => void;
   cart: ObjectId[];
@@ -136,7 +136,10 @@ export default function Featured({ featuredProduct }: any) {
             </div>
           </Column>
           <div>
-            <img src={imageUrl} alt="photo" />
+            <Image src={imageUrl} alt="photo" width={100} height={100} layout="responsive" style={{
+              maxWidth: "100%",
+              borderRadius: "1rem"
+            }} />
           </div>
         </Wrapper>
       </Center>

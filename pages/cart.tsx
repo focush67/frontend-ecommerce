@@ -231,7 +231,7 @@ export default function Home() {
       console.log("CART FROM BACKEND", response.data);
     };
     fetchCart();
-  });
+  },[session]);
 
   const emptyCart = async () => {
     const requestBody = {
