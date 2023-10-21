@@ -93,7 +93,7 @@ export default async function handle(
             price: productDetails.price,
             coverPhoto: productDetails.coverPhoto,
             quantity: 1,
-            stripeID: productDetails.stripeID,
+            stripeProductID: productDetails.stripeProductID,
           });
         }
 
@@ -120,7 +120,7 @@ export default async function handle(
               price: productDetails.price,
               coverPhoto: productDetails.coverPhoto,
               quantity: 1,
-              stripeID: productDetails.stripeID,
+              stripeProductID: productDetails.stripeProductID,
             }
           ]
         });

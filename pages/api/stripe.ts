@@ -1,8 +1,9 @@
-import stripePackage from "stripe";
+import { Stripe } from "stripe";
 import { NextApiRequest,NextApiResponse } from "next";
 
-const stripe = stripePackage(process.env.NEXT_PUBLIC_STRIPE_PRIVATE_KEY || "");
-
+const stripe = new Stripe(process.env.NEXT_PUBLIC_STRIPE_PRIVATE_KEY! , {
+  apiVersion: "2023-08-16",
+})
 export default async function handleStripePayment(req:NextApiRequest,res:NextApiResponse){
     if(req.method !== "POST")
     {
@@ -15,7 +16,7 @@ export default async function handleStripePayment(req:NextApiRequest,res:NextApi
        const session = await stripe.checkout.sessions.create({
         payment_method_types: ['card'],
         line_items: userCart.map((product: any) => {
-          const unitAmountCents = (parseFloat(product.price)*100);
+          const unitAmountCents = Math.round(parseFloat(product.price)*100);
           console.log(`Product: ${product.title}, Unit Amount (rupees): ${unitAmountCents}`);
           
           if (unitAmountCents < 1) {

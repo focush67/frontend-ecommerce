@@ -5,7 +5,6 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { Card } from "@/components/Card";
 import styled from "styled-components";
-import PrimaryButton from "@/components/Buttons";
 const CardContainer = styled.div`
   width: 100vw;
   height: 100vh;

@@ -2,12 +2,9 @@ import {
   CardWrapper,
   CardImage,
   CardTextWrapper,
-  CardTextDate,
   CardTextTitle,
   CardTextBody,
   CardStatWrapper,
-  CardStats,
-  LinkText
 } from "./CardStyles";
 import Tilt from "react-parallax-tilt";
 
@@ -21,7 +18,8 @@ export const Card = ({ title, description , price , imgUrl }: any) => {
           <CardTextBody>
             {description}
           </CardTextBody>
-          <CardTextTitle>{price}</CardTextTitle>
+          
+          <CardTextTitle>₹ {price}</CardTextTitle>
         </CardTextWrapper>
         <CardStatWrapper>
           

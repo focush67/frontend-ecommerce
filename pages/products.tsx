@@ -1,13 +1,12 @@
 import styled from "styled-components";
-import { getSession } from "next-auth/react";
+import { getSession, useSession } from "next-auth/react";
 import Header from "@/components/Header";
 import { useState, useEffect } from "react";
-import { ref, getDownloadURL, listAll } from "firebase/storage";
-import { storage } from "@/firebaseConfig";
+
 import { FaSpinner } from "react-icons/fa";
 import axios from "axios";
-import { Price,ProductInfoBox, Title } from "@/components/ProductBox";
-import PrimaryButton, { NeutralButton } from "@/components/Buttons";
+import { ProductInfoBox, Title } from "@/components/ProductBox";
+import { NeutralButton } from "@/components/Buttons";
 import { useRouter } from "next/router";
 
 const ProductWrapper = styled.div`
@@ -55,9 +54,9 @@ const ProductDescription = styled.div`
 
 
 export default function Products() {
-  const session = getSession();
+  const {data: session} = useSession();
   const [newProducts, setNewProducts] = useState([]);
-  const [productImages, setProductImages] = useState([{}]);
+  const [productImages, setProductImages] = useState([]);
   const [load, setLoad] = useState(true);
   const router = useRouter();
   function getFirst20Words(inputString:String){
@@ -79,6 +78,7 @@ export default function Products() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
+        console.log("Session: ",session?.user);
         const response = await axios.get("/api/products");
         console.log(response.data);
         if (response.status === 200) {
@@ -91,7 +91,7 @@ export default function Products() {
     };
     setLoad(false);
     fetchProducts();
-    setProductImages(JSON.parse(localStorage.getItem("product_images")));
+    setProductImages(JSON.parse(localStorage.getItem("product_images") || ""));
   }, []);
 
  

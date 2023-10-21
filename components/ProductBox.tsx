@@ -17,7 +17,7 @@ export const WhiteBox = styled.div`
   border-radius: 5px;
   img {
     max-width: 100%;
-    max-height: 80px;
+    max-height: 100px;
   }
 `;
 
@@ -74,7 +74,7 @@ export default function ProductBox({ product, imageUrl }: any) {
           price: product.price,
           coverPhoto: Array.isArray(imageUrl) ? imageUrl[0] : imageUrl,
           quantity: 1,
-          stripeID: product.stripeID,
+          stripeProductID: product.stripeProductID,
         },
       };
   

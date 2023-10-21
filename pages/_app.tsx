@@ -42,7 +42,7 @@ export default function App({
         <ScrollaleContainer>
           <GlobalStyles />
           <CartContextProvider>
-            <Component {...pageProps} />
+            <Component {...pageProps} suppressHydrationWarning />
           </CartContextProvider>
         </ScrollaleContainer>
       </SessionProvider>

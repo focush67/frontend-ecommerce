@@ -79,7 +79,7 @@ export default function Home({ featuredProduct, newProducts }: any) {
 }
 
 export async function getServerSideProps() {
-  const featuredProductID = "650a38f6a3394adf83ec27af";
+  const featuredProductID = "6532b939899b9097c03be119";
 
   await mongooseConnect();
 

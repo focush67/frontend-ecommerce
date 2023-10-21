@@ -5,7 +5,6 @@ import { CartContext } from "./CartContext";
 import { useContext } from "react";
 import { signIn, signOut } from "next-auth/react";
 import PrimaryButton, { NeutralButton } from "./Buttons";
-
 const StyledHeader = styled.header`
   background-color: #000;
   position: sticky;
@@ -13,7 +12,7 @@ const StyledHeader = styled.header`
   z-index: 100;
 `;
 
-const Logo = styled(Link)`
+const Logo = styled(Link)<{disablepointerevents?:boolean}>`
   color: #aaa;
   text-decoration: none;
   transition: transform 150ms ease-in;
@@ -25,11 +24,7 @@ const Logo = styled(Link)`
   }
 
   /* Apply pointer-events: none when totalItems is 0 */
-  ${({ disablePointerEvents }) =>
-    disablePointerEvents &&
-    `
-    pointer-events: none;
-  `}
+  pointer-events: ${({disablepointerevents}) => disablepointerevents ? "none" : "auto"};
 `;
 
 const Wrapper = styled.div`
@@ -67,11 +62,11 @@ interface Profile{
   email: String,
 };
 
-const ProfileInfoWrapper = styled.div`
+const ProfileInfoWrapper = styled.div<{signedIn?:boolean}>`
   pointer-events: ${({ signedIn }) => (signedIn ? "none" : "auto")};
 `;
 
-export default function Header({profile}:any) {
+export default function Header({profile,initialTotalItems}:any) {
   const { cart, clearCart } = useContext(CartContext);
   const signOutAndClearStorage = async () => {
     clearCart();
@@ -79,9 +74,9 @@ export default function Header({profile}:any) {
   };
 
   const totalItems = Object.values(cart).reduce(
-    (total, quantity) => total + parseInt(quantity),
+    (total:number, quantity:any) => total + parseInt(quantity),
     0
-  );
+  ) || initialTotalItems;
 
   return (
     <StyledHeader>
@@ -95,7 +90,7 @@ export default function Header({profile}:any) {
             <Logo
               href={"/cart"}
               className="cart"
-              disablePointerEvents={totalItems === 0}
+              disablepointerevents={totalItems === 0}
             >
               Cart ({totalItems || 0})
             </Logo>
@@ -127,4 +122,19 @@ export default function Header({profile}:any) {
       </Center>
     </StyledHeader>
   );
+}
+
+
+export async function getServerSideProps(){
+  const initialTotalItems = calculateInitialTotalItems();
+  return{
+    props:{
+      initialTotalItems,
+    },
+  }
+}
+
+function calculateInitialTotalItems(){
+  const totalItemsInCart = localStorage.getItem("user_cart")?.length;
+  return totalItemsInCart;
 }

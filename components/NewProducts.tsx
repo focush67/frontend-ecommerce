@@ -26,7 +26,7 @@ const StyledHeader = styled.h2`
 export default function NewProducts({ newProducts }: any) {
   
   const [load, setLoad] = useState(true);
-  const [images,setImages] = useState([{}]);
+  const [images,setImages] = useState<any>([{}]);
   const [imagesLS,setImagesLS] = useState([{}]);
   useEffect(() => {
     if (!newProducts) {
@@ -36,14 +36,13 @@ export default function NewProducts({ newProducts }: any) {
     
     const imageFetching = async() => {
       const imagesUrls = await fetchImages(newProducts);
-      //console.log(imagesUrls);
       setImages(imagesUrls);
     }
 
     imageFetching();
     setLoad(false);
 
-    setImagesLS(JSON.parse(localStorage.getItem("product_images")));
+    setImagesLS(JSON.parse(localStorage.getItem("product_images") || ""));
   },[])
 
   return (
@@ -68,7 +67,7 @@ export default function NewProducts({ newProducts }: any) {
                 <ProductBox
                   key={index}
                   product={product}
-                  imageUrl={imagesLS[product.title] || images[product?.title][0]}
+                  imageUrl={imagesLS[product?.title] || (images[product?.title] && images[product?.title][0])}
                 />
               ))
             )}

@@ -1,9 +1,15 @@
 import styled, { css } from "styled-components";
 
+interface ButtonProps{
+  children: React.ReactNode;
+  background: string;
+  size: "small" | "medium" | "large";
+  onClick: (e: React.MouseEvent<HTMLButtonElement>) => void;
+}
 
 const buttonStyles = css`
   display: inline-flex;
-  background-color: ${props => props.background || "blue"};
+  background-color: ${(props:any) => props.background || "blue"};
   border: 0;
   color: #fff;
   padding: 11px;
@@ -19,19 +25,19 @@ const buttonStyles = css`
     margin-right: 6px;
   }
 
-  ${props =>
+  ${(props:any) =>
     props.size === "large" &&
     css`
       font-size: 1.2rem;
       padding: 10px 15px;
     `}
-  ${props =>
+  ${(props:any) =>
     props.size === "medium" &&
     css`
       font-size: 1.1rem;
       padding: 6px 11px;
     `}
-  ${props =>
+  ${(props:any) =>
     props.size === "small" &&
     css`
       font-size: 0.9rem;
@@ -39,15 +45,15 @@ const buttonStyles = css`
     `}
 `;
 
-const StyledButtonPrimary = styled.button`
+const StyledButtonPrimary = styled.button<ButtonProps>`
   ${buttonStyles};
-  background-color: ${props => props.background === "white" ? "transparent" : props.background};
-  border: ${props => props.background === "white" ? "2px solid blue" : "none"};
-  color:${props => props.background === "white" ? "blue" : "white"};
+  background-color: ${(props:any) => props.background === "white" ? "transparent" : props.background};
+  border: ${(props:any) => props.background === "white" ? "2px solid blue" : "none"};
+  color:${(props:any) => props.background === "white" ? "blue" : "white"};
   
 `;
 
-const StyledButtonNeutral = styled.button`
+const StyledButtonNeutral = styled.button<ButtonProps>`
   ${buttonStyles};
   background-color: #000;
   color: #f3eaea;
@@ -62,3 +68,4 @@ export default function PrimaryButton({ children, ...rest }: any) {
 export const NeutralButton = ({ children, ...rest }: any) => {
   return <StyledButtonNeutral {...rest}>{children}</StyledButtonNeutral>;
 };
+

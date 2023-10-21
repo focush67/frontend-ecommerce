@@ -1,13 +1,12 @@
 import { createContext, useState, useEffect } from "react";
 
-export const CartContext = createContext({});
+export const CartContext = createContext<any>({});
 
-export function CartContextProvider({ children }) {
-  // Use a function to access local storage to avoid hydration issues
+export function CartContextProvider({children}:{children:any}) {
   const getLocalStorage = () => {
     if (typeof window !== "undefined") {
       const ls = window.localStorage;
-      const defaultProducts = JSON.parse(ls.getItem("user_cart")) || {};
+      const defaultProducts = JSON.parse(ls.getItem("user_cart")!) || {};
       return defaultProducts;
     }
     return {};
@@ -17,7 +16,7 @@ export function CartContextProvider({ children }) {
 
   useEffect(() => {
     if (Object.keys(cart).length > 0) {
-      // Update local storage when the cart changes
+
       localStorage.setItem("user_cart", JSON.stringify(cart));
     }
   }, [cart]);
@@ -25,7 +24,9 @@ export function CartContextProvider({ children }) {
   const clearCart = () => {
     // Clear the cart in both state and local storage
     setCart({});
-    localStorage.removeItem("user_cart");
+    if(typeof window !== "undefined"){
+      localStorage.removeItem("user_cart");
+    }
   };
 
   return (

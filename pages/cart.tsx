@@ -124,12 +124,12 @@ const SubmitButton = styled.button`
 export default function Home() {
   const router = useRouter();
   const { data: session } = useSession();
-  const [products, setProducts] = useState([{}]);
+  const [products, setProducts] = useState([]);
   const [totalCost, setTotalCost] = useState(0);
   const { cart, setCart, clearCart } = useContext<CartContextType>(CartContext);
   const [formData, setFormData] = useState({
-    name: session?.user?.name,
-    email: session?.user?.email,
+    name: session?.user?.name || "",
+    email: session?.user?.email || "",
     address: "",
     phone: "",
     payment: "Yes",
@@ -178,8 +178,8 @@ export default function Home() {
       console.log("SESSION: ",stripeResponse.data.session.url);
       
       const lineItems = await Promise.all(products.map(async (prod:any) => {
-        console.log(prod.stripeID);
-        const priceId = await getPriceIdByStripeProductId(prod.stripeID);
+        console.log(prod.stripeProductID);
+        const priceId = await getPriceIdByStripeProductId(prod.stripeProductID);
         return{
           price: priceId,
           quantity: prod.quantity,
@@ -187,39 +187,33 @@ export default function Home() {
       }))
 
       console.log("Lineitems: ",lineItems);
+      console.log("Stripe Response: ",stripeResponse);
 
-      const response = await axios.post("/api/orders", {
+      await axios.post("/api/orders", {
         ...formData,
         userCart: products,
       });
-
-
+      localStorage.removeItem("user_cart");
       await emptyCart();
+    
 
       const {sessionId} = stripeResponse.data.session;
       const {error} = await stripe?.redirectToCheckout({
         sessionId,
         lineItems,
         successUrl: "http://localhost:3001/myorders",
-        cancelUrl: "http://localhost:3001/cancel",
+        cancelUrl: "http://localhost:3001/cart",
         mode: "payment",
       })
-
-
       if(error){
         console.log("Error frontend: ",error);
       }
-
-      else{
-        localStorage.clear("user_cart");
-      }
-
-      
       
     } catch (error: any) {
       console.log("Error from frontend ",error);
     }
   };
+
 
   useEffect(() => {
     if(!session)
@@ -231,7 +225,7 @@ export default function Home() {
       const response = await axios.get(
         `/api/cart/?email=${session?.user?.email}`
       );
-      setProducts((prev: any) => [...response.data.userCart]);
+      setProducts(response?.data?.userCart || []);
         
       console.log("CART FROM LOCAL ", cart);
       console.log("CART FROM BACKEND", response.data);
@@ -261,7 +255,7 @@ export default function Home() {
       const cartData = {
         name: session?.user?.name,
         email: session?.user?.email,
-        avatar: session?.user?.avatar,
+        avatar: session?.user?.image,
         productDetails: {
           _id: product._id,
           title: product.title,
@@ -306,7 +300,7 @@ export default function Home() {
       });
 
       if (response.status === 200) {
-        if (cart[product._id] > 0) {
+        if (Number(cart[product._id]) > 0) {
           setCart((prev: any) => ({
             ...prev,
             [product._id]: prev[product._id] - 1,
@@ -321,17 +315,17 @@ export default function Home() {
     }
 
     try {
-      const response = await axios.delete("/api/temp");
+      await axios.delete("/api/temp");
     } catch (error: any) {
       console.log(error);
     }
   };
 
-  const filteredProducts = products.filter((prod: any) => cart[prod?._id] > 0);
+  const filteredProducts = products.filter((prod: any) => Number(cart[prod?._id]) > 0);
 
   useEffect(() => {
     const initialTotalCost = filteredProducts.reduce(
-      (acc, prod) => acc + (parseFloat(prod?.price) || 0) * cart[prod?._id],
+      (acc, prod:any) => acc + (parseFloat(prod?.price) || 0) * Number(cart[prod?._id]),
       0
     );
 
@@ -382,7 +376,7 @@ export default function Home() {
                           -{" "}
                         </StyledButton>
                         <span style={{ fontWeight: "600" }}>
-                          {cart[prod?._id]}
+                          {Number(cart[prod?._id])}
                         </span>
                         <StyledButton
                           className="plus"
@@ -423,7 +417,7 @@ export default function Home() {
             />
 
             <InputField
-              type="text"
+              type="email"
               placeholder="Email"
               name="email"
               value={formData.email}

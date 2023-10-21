@@ -10,7 +10,7 @@ const orderSchema = new Schema({
     phone :{type:String,required:true},
     payment :{type:String,required:true,default:"debit-card"},
     userCart: [CartItems],
-    paymentStatus:{type:String , default:"No"},
+    paymentStatus:{type:String , default:"Yes"},
 });
 
 export const Order = (models.Order || model("Order",orderSchema));

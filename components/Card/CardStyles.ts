@@ -53,6 +53,7 @@ export const CardTextTitle = styled.h2`
   background-clip: text;
   -webkit-background-clip: text;
   color: transparent;
+  
 `;
 
 export const CardTextBody = styled.p`

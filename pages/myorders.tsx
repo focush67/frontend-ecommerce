@@ -5,7 +5,7 @@ import axios from "axios";
 import { styled } from "styled-components";
 
 const OrdersTable = styled.table`
-  width: 100%;
+  width: 100vw;
 `;
 
 const TableHeader = styled.th`
@@ -78,7 +78,6 @@ export default function MyOrder() {
           <tr>
             <TableHeader>Order ID</TableHeader>
             <TableHeader>Name</TableHeader>
-            <TableHeader>Email</TableHeader>
             <TableHeader>Items</TableHeader>
             <TableHeader>Paid</TableHeader>
           </tr>
@@ -89,7 +88,6 @@ export default function MyOrder() {
             <TableRow key={order._id}>
               <TableCell>{order._id}</TableCell>
               <TableCell>{order.name}</TableCell>
-              <TableCell>{order.email}</TableCell>
               <TableCell>
                 <CartItemsContainer>
                   {order.userCart?.map((item: any) => (

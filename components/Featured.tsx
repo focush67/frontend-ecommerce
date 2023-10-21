@@ -9,6 +9,7 @@ import { CartContext } from "./CartContext";
 import { ObjectId } from "mongoose";
 import axios from "axios";
 import { signIn, useSession } from "next-auth/react";
+import { MouseEvent } from "react";
 export type CartContextType = {
   addToCart: (productID: ObjectId) => void;
   cart: ObjectId[];
@@ -68,7 +69,7 @@ export default function Featured({ featuredProduct }: any) {
             return fileNameA.localeCompare(fileNameB);
           });
 
-          const firstImage = sortedItems[sortedItems.length - 1];
+          const firstImage = sortedItems[0];
           getDownloadURL(firstImage).then((url) => {
             setImageUrl(url);
           });
@@ -77,7 +78,7 @@ export default function Featured({ featuredProduct }: any) {
       .catch((error: any) => console.log(error));
   }, []);
 
-  const addFeaturedProductToCart = async () => {
+  const addFeaturedProductToCart: () => void = async () => {
     if (!session) {
       await signIn("google");
       return;
@@ -94,7 +95,7 @@ export default function Featured({ featuredProduct }: any) {
           price: featuredProduct.price,
           coverPhoto: imageUrl,
           quantity: 1,
-          stripeID: featuredProduct.stripeID,
+          stripeProductID: featuredProduct.stripeProductID,
         },
       };
 
@@ -127,7 +128,7 @@ export default function Featured({ featuredProduct }: any) {
               <Description>{featuredProduct?.description}</Description>
               <Column>
                 <NeutralButton size="large">Read More</NeutralButton>
-                <PrimaryButton size="large" onClick={addFeaturedProductToCart}>
+                <PrimaryButton size="large" onClick={(e: React.MouseEvent<HTMLButtonElement>) => addFeaturedProductToCart()}>
                   <Cart />
                   Add to Cart
                 </PrimaryButton>
