@@ -204,7 +204,7 @@ export default function Home() {
         successUrl: "http://localhost:3001/myorders",
         cancelUrl: "http://localhost:3001/cart",
         mode: "payment",
-      })
+      })!
       if(error){
         console.log("Error frontend: ",error);
       }
