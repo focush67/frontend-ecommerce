@@ -57,7 +57,7 @@ export default function Home({ featuredProduct, newProducts }: any) {
     };
 
     fetchCartData();
-  }, []);
+  },[setCart]);
 
   if (session) {
     return (

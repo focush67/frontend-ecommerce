@@ -76,7 +76,7 @@ export default function Featured({ featuredProduct }: any) {
         }
       })
       .catch((error: any) => console.log(error));
-  }, []);
+  });
 
   const addFeaturedProductToCart: () => void = async () => {
     if (!session) {

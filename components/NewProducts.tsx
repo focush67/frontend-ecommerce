@@ -43,7 +43,7 @@ export default function NewProducts({ newProducts }: any) {
     setLoad(false);
 
     setImagesLS(JSON.parse(localStorage.getItem("product_images") || ""));
-  },[])
+  },[newProducts])
 
   return (
     <>

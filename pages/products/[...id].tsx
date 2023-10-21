@@ -38,7 +38,7 @@ export default function ProductDetails(){
         }
 
         fetchProduct();
-    },[])
+    },[id])
 
     return(
         <div>
