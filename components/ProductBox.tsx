@@ -5,7 +5,7 @@ import { CartContext } from "./CartContext";
 import {useContext} from 'react';
 import {CartContextType} from './Featured';
 import {signIn, useSession} from "next-auth/react";
-
+import Image from "next/image";
 export const WhiteBox = styled.div`
   background-color: #fff;
   padding: 20px;
@@ -15,10 +15,6 @@ export const WhiteBox = styled.div`
   align-items: center;
   justify-content: center;
   border-radius: 5px;
-  img {
-    max-width: 100%;
-    max-height: 100px;
-  }
 `;
 
 export const Title = styled.h2`
@@ -109,7 +105,10 @@ export default function ProductBox({ product, imageUrl }: any) {
     <div>
       <WhiteBox>
         <div>
-          <img src={Array.isArray(imageUrl) ? imageUrl[0] : imageUrl} alt="image" onError={(e:any)=>e.currentTarget.src=fallBackUrl}/>
+          <Image src={Array.isArray(imageUrl) ? imageUrl[0] : imageUrl} alt={"image"} onError={(e:any) => e.currentTarget.src=fallBackUrl} layout="responsive" height={100} width={100} style={{
+            maxWidth: "100%",
+            maxHeight: "108px"
+          }}/>
         </div>
       </WhiteBox>
 
