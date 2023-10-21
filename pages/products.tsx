@@ -92,7 +92,7 @@ export default function Products() {
     setLoad(false);
     fetchProducts();
     setProductImages(JSON.parse(localStorage.getItem("product_images") || ""));
-  }, []);
+  }, [productImages]);
 
  
 
