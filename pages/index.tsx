@@ -44,6 +44,10 @@ export default function Home({ featuredProduct, newProducts }: any) {
         
         //console.log("User Session: ",userSession);
         const userCart = response.data.userCart;
+        
+        if(!userCart){
+          return;
+        }
 
         for (let i = 0; i < userCart.length; i++) {
           const currentProduct = userCart[i];

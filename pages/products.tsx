@@ -58,7 +58,12 @@ const ProductDescription = styled.div`
 export default function Products() {
   const {data: session} = useSession();
   const [newProducts, setNewProducts] = useState([]);
-  const [productImages, setProductImages] = useState(JSON.parse(localStorage.getItem("product_images") || ""));
+  const [productImages, setProductImages] = useState([]);
+
+  if(typeof window !== "undefined"){
+    setProductImages(JSON.parse(localStorage.getItem("product_images") || "{}"));
+  }
+  
   const [load, setLoad] = useState(true);
   const router = useRouter();
   function getFirst20Words(inputString:String){
@@ -99,7 +104,9 @@ export default function Products() {
       }
     };
     fetchProducts();
-    setProductImages(JSON.parse(localStorage.getItem("product_images") || ""));
+    if(typeof window !== "undefined"){
+      setProductImages(JSON.parse(localStorage.getItem("product_images") || "{}"));
+    }
   }, []);
 
  

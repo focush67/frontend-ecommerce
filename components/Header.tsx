@@ -135,6 +135,10 @@ export async function getServerSideProps(){
 }
 
 function calculateInitialTotalItems(){
+  if(!localStorage.getItem("user_cart")){
+    return 0;
+  }
+  
   const totalItemsInCart = localStorage.getItem("user_cart")?.length;
   return totalItemsInCart;
 }
