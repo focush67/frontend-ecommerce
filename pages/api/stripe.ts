@@ -42,8 +42,8 @@ export default async function handleStripePayment(
       }),
       mode: "payment",
       customer_email: formData.email,
-      success_url: `${process.env.VERCEL_URL}/myorders?success=1`,
-      cancel_url: `${process.env.VERCEL_URL}/cart?canceled=1`,
+      success_url: `${process.env.NEXT_PUBLIC_VERCEL_URL}/myorders?success=1`,
+      cancel_url: `${process.env.NEXT_PUBLIC_VERCEL_URL}/cart?canceled=1`,
     });
 
     console.log("Session from backend: ", session);
