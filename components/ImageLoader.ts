@@ -11,7 +11,7 @@ interface ProductImagesMap{
 
 const imageCache:ImageCache = {};
 
-export default async function fetchImages(newProducts:any){
+export default async function fetchImages(newProducts:any[]){
     const productImagesMap:ProductImagesMap = {};
     for(const product of newProducts)
     {

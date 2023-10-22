@@ -1,5 +1,7 @@
+"use client";
+
 import styled from "styled-components";
-import { getSession, useSession } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import Header from "@/components/Header";
 import { useState, useEffect } from "react";
 
@@ -56,7 +58,7 @@ const ProductDescription = styled.div`
 export default function Products() {
   const {data: session} = useSession();
   const [newProducts, setNewProducts] = useState([]);
-  const [productImages, setProductImages] = useState([]);
+  const [productImages, setProductImages] = useState(JSON.parse(localStorage.getItem("product_images") || ""));
   const [load, setLoad] = useState(true);
   const router = useRouter();
   function getFirst20Words(inputString:String){
@@ -83,18 +85,21 @@ export default function Products() {
         console.log(response.data);
         if (response.status === 200) {
           setNewProducts(response.data);
+          setLoad(false);
+          if(typeof window !== undefined){
+            const storedProductImages = localStorage.getItem("product_images") || "{}";
+            if(storedProductImages){
+              setProductImages(JSON.parse(storedProductImages));
+            }
+          }
         }
         console.log(productImages);
       } catch (error) {
         console.error("Error fetching products:", error);
       }
     };
-    setLoad(false);
     fetchProducts();
-    setProductImages(JSON.parse(localStorage.getItem("product_images") || ""));
-  }, []);
-
- 
+  },[session?.user]);
 
   return (
     <>

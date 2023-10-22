@@ -7,7 +7,7 @@ import NewProducts from "@/components/NewProducts";
 import { useSession, getSession } from "next-auth/react";
 import axios from "axios";
 import { CartContext } from "@/components/CartContext";
-import fetchImages from "./ImageLoader";
+import fetchImages from "../components/ImageLoader";
 
 export default function Home({ featuredProduct, newProducts }: any) {
   const [latest, setLatest] = useState(newProducts);
@@ -21,6 +21,9 @@ export default function Home({ featuredProduct, newProducts }: any) {
         if (response.ok) {
           const newProductsData = await response.json();
           setLatest(newProductsData);
+        }
+        else{
+          throw new Error("Failed to fetch products");
         }
       } catch (error: any) {
         console.log(error.message);
@@ -57,7 +60,7 @@ export default function Home({ featuredProduct, newProducts }: any) {
     };
 
     fetchCartData();
-  },[cart]);
+  },[cart,setCart]);
 
   if (session) {
     return (

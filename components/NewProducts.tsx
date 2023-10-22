@@ -3,7 +3,7 @@ import { Column } from "./Featured";
 import ProductBox from "./ProductBox";
 import { useEffect, useState } from "react";
 import { FaSpinner } from "react-icons/fa";
-import fetchImages from "@/pages/ImageLoader";
+import fetchImages from "@/components/ImageLoader";
 export const ProductsGrid = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr 1fr 1fr;

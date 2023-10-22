@@ -58,11 +58,8 @@ export default function MyOrder() {
           `/api/orders?email=${session?.user?.email}`
         );
 
-        console.log(response.data);
-
         setOrders(Object.values(response.data));
 
-        console.log("Orders: ", orders);
       } catch (error: any) {
         console.log(error.message);
       }
@@ -91,7 +88,7 @@ export default function MyOrder() {
               <TableCell>
                 <CartItemsContainer>
                   {order.userCart?.map((item: any) => (
-                    <CartItem>
+                    <CartItem key={item._id}>
                       <CartItemImage key={item._id} src={item.coverPhoto} />
                       <p>{item?.quantity}</p>
                     </CartItem>

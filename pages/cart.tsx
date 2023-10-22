@@ -10,8 +10,8 @@ import axios from "axios";
 import { NeutralButton } from "@/components/Buttons";
 import { useSession } from "next-auth/react";
 import { loadStripe } from "@stripe/stripe-js";
+import Image from "next/image";
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY || " ");
-
 
 
 const PageContainer = styled.div`
@@ -231,7 +231,7 @@ export default function Home() {
       console.log("CART FROM BACKEND", response.data);
     };
     fetchCart();
-  },[session]);
+  },[session,cart]);
 
   const emptyCart = async () => {
     const requestBody = {
@@ -353,9 +353,11 @@ export default function Home() {
                   <TableRow key={index}>
                     <TableCell>
                       <div style={{ maxWidth: "100px", marginBottom: "8px" }}>
-                        <img
+                        <Image
                           src={prod?.coverPhoto}
                           alt={`Image of ${prod?.title}`}
+                          width={100}
+                          height={100}
                           style={{ maxWidth: "100%", height: "auto" }}
                         />
                       </div>
