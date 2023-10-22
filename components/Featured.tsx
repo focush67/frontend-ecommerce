@@ -136,10 +136,10 @@ export default function Featured({ featuredProduct }: any) {
             </div>
           </Column>
           <div>
-            <Image src={imageUrl} alt="photo" width={100} height={100} layout="responsive" style={{
+            <Image src={imageUrl} alt="photo" width={200} height={200} style={{
               maxWidth: "100%",
               borderRadius: "1rem"
-            }} />
+            }} layout="responsive"/>
           </div>
         </Wrapper>
       </Center>

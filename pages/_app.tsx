@@ -4,6 +4,7 @@ import { SessionProvider } from "next-auth/react";
 import styled from "styled-components";
 import { createGlobalStyle } from "styled-components";
 import { CartContextProvider } from "@/components/CartContext";
+import ErrorBoundary from "@/components/ErrorBoundary";
 const GlobalStyles = createGlobalStyle`
 @import url('https://fonts.googleapis.com/css2?family=Mooli&display=swap');
   body{
@@ -42,7 +43,9 @@ export default function App({
         <ScrollaleContainer>
           <GlobalStyles />
           <CartContextProvider>
+            <ErrorBoundary>
             <Component {...pageProps} suppressHydrationWarning />
+            </ErrorBoundary>
           </CartContextProvider>
         </ScrollaleContainer>
       </SessionProvider>
