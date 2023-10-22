@@ -99,7 +99,10 @@ export default function Products() {
       }
     };
     fetchProducts();
-  },[session?.user]);
+    setProductImages(JSON.parse(localStorage.getItem("product_images") || ""));
+  }, []);
+
+ 
 
   return (
     <>

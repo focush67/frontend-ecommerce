@@ -88,7 +88,7 @@ export default function MyOrder() {
               <TableCell>
                 <CartItemsContainer>
                   {order.userCart?.map((item: any) => (
-                    <CartItem key={item._id}>
+                    <CartItem>
                       <CartItemImage key={item._id} src={item.coverPhoto} />
                       <p>{item?.quantity}</p>
                     </CartItem>
