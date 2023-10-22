@@ -30,11 +30,12 @@ export default async function handle(
 
   if (method === "POST") {
     try {
-      const { name, email, address, phone, payment, userCart,amount } = request.body;
+      const { sessionId,name, email, address, phone, payment, userCart,amount } = request.body;
       const orderID = new mongoose.Types.ObjectId();
 
       await Order.create({
         _id: orderID,
+        sessionId,
         name,
         email,
         address,
@@ -47,6 +48,7 @@ export default async function handle(
       return response.json({
         message: "Order placed",
         orderID: `${orderID}`,
+        sessionId: `${sessionId}`,
         status: 200,
       });
     } catch (error: any) {

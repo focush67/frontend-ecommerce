@@ -135,6 +135,7 @@ export default function Home() {
     payment: "Yes",
   });
 
+  const [sessionID,setSessionID] = useState<string>("");
   const handleChange = (e: any) => {
     const { name, value } = e.target;
     setFormData({
@@ -169,15 +170,12 @@ export default function Home() {
     console.log("Form Data: ", formData);
     const stripe = await stripePromise;
     try {
-
       const stripeResponse = await axios.post("/api/stripe",{
         formData,
         userCart: products,
       });
 
-      console.log("SESSION: ",stripeResponse.data.session.url);
       const lineItems = await Promise.all(products.map(async (prod:any) => {
-        console.log(prod.stripeProductID);
         const priceId = await getPriceIdByStripeProductId(prod.stripeProductID);
         return{
           price: priceId,
@@ -186,24 +184,29 @@ export default function Home() {
       }))
 
       console.log("Lineitems: ",lineItems);
-      console.log("Stripe Response: ",stripeResponse);
+      console.log("Stripe Response Data: ",stripeResponse.data);
 
-      await axios.post("/api/orders", {
+      const {id} = stripeResponse.data.session;
+      setSessionID(id);
+      
+      await axios.post("/api/orders",{sessionId:id,
         ...formData,
         userCart: products,
-      });
+      })
+
       localStorage.removeItem("user_cart");
       await emptyCart();
-    
 
-      const {sessionId} = stripeResponse.data.session;
+      console.log("UserSessionId: ",id);
+      if(!id)
+      {
+        return;
+      }
+      
       const {error} = await stripe?.redirectToCheckout({
-        sessionId,
-        lineItems,
-        successUrl: `${process.env.NEXT_PUBLIC_VERCEL_URL}/myorders`,
-        cancelUrl: `${process.env.NEXT_PUBLIC_VERCEL_URL}/cart`,
-        mode: "payment",
+        sessionId:id,
       })!
+
       if(error){
         console.log("Error frontend: ",error);
       }
@@ -331,10 +334,6 @@ export default function Home() {
     setTotalCost(initialTotalCost);
   }, [filteredProducts, cart]);
 
-
-  useEffect(()=>{
-    console.log("VERCEL URL: ",process.env.NEXT_PUBLIC_VERCEL_URL);
-  },[])
 
   return (
     <>

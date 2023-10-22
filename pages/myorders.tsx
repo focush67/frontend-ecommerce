@@ -4,6 +4,17 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { styled } from "styled-components";
 
+interface Order{
+  _id: string;
+  name: string;
+  userCart: any[];
+  sessionId: string;
+}
+
+interface PaymentStats{
+  [sessionId: string]:string;
+}
+
 const OrdersTable = styled.table`
   width: 100vw;
 `;
@@ -50,7 +61,40 @@ const CartItemImage = styled.img`
 
 export default function MyOrder() {
   const { data: session } = useSession();
-  const [orders, setOrders] = useState([]);
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [paymentStats,setPaymentStats] = useState<PaymentStats>({});
+  const fetchPaymentStatus = async(userSessionId:string) => {
+    try {
+      const response = await axios.get(`/api/payment-status?userSessionId=${userSessionId}`);
+      
+      return response.data.paymentStatus;
+    } catch (error:any){
+      console.log(error);
+      return "Error";
+    }
+  }
+
+  const fetchPaymentStatusForOrder = async(userSessionId:string) => {
+    try {
+      const response = await axios.get(`/api/payment-status?userSessionId=${userSessionId}`);
+      return response.data.paymentStatus;
+    } catch (error:any){
+      console.log(error);
+    }
+  }
+
+  useEffect(() => {
+    const productPaymentStati:PaymentStats = {};
+    const fetchPaymentStatiForCart = async() => {
+      for(const order of orders){
+        const status = await fetchPaymentStatusForOrder(order?.sessionId);
+        productPaymentStati[order.sessionId] = status;
+      }
+      setPaymentStats(productPaymentStati);
+    }
+    fetchPaymentStatiForCart();
+  } ,[orders])
+
   useEffect(() => {
     const fetchOrders = async () => {
       try {
@@ -96,7 +140,7 @@ export default function MyOrder() {
                 </CartItemsContainer>
               </TableCell>
               
-              <TableCell>{order.paymentStatus}</TableCell>
+              <TableCell>{paymentStats[order?.sessionId]}</TableCell>
             </TableRow>
           ))}
         </tbody>
