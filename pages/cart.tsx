@@ -176,7 +176,6 @@ export default function Home() {
       });
 
       console.log("SESSION: ",stripeResponse.data.session.url);
-      
       const lineItems = await Promise.all(products.map(async (prod:any) => {
         console.log(prod.stripeProductID);
         const priceId = await getPriceIdByStripeProductId(prod.stripeProductID);
@@ -333,6 +332,9 @@ export default function Home() {
   }, [filteredProducts, cart]);
 
 
+  useEffect(()=>{
+    console.log("VERCEL URL: ",process.env.NEXT_PUBLIC_VERCEL_URL);
+  },[])
 
   return (
     <>
