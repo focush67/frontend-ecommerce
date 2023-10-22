@@ -201,8 +201,8 @@ export default function Home() {
       const {error} = await stripe?.redirectToCheckout({
         sessionId,
         lineItems,
-        successUrl: `${process.env.VERCEL_URL}/myorders`,
-        cancelUrl: `${process.env.VERCEL_URL}/cart`,
+        successUrl: `${process.env.NEXT_PUBLIC_VERCEL_URL}/myorders`,
+        cancelUrl: `${process.env.NEXT_PUBLIC_VERCEL_URL}/cart`,
         mode: "payment",
       })!
       if(error){
