@@ -57,13 +57,7 @@ const ProductDescription = styled.div`
 
 export default function Products() {
   const {data: session} = useSession();
-  const [newProducts, setNewProducts] = useState([]);
-  const [productImages, setProductImages] = useState([]);
-
-  if(typeof window !== "undefined"){
-    setProductImages(JSON.parse(localStorage.getItem("product_images") || "{}"));
-  }
-  
+  const [newProducts, setNewProducts] = useState([]);  
   const [load, setLoad] = useState(true);
   const router = useRouter();
   function getFirst20Words(inputString:String){
@@ -72,6 +66,16 @@ export default function Products() {
     return result;
   }
 
+  const [productImages,setProductsImages] = useState([]);
+
+  useEffect(()=>{
+    if(localStorage){
+      setProductsImages(JSON.parse(localStorage.getItem("product_images") || "[]"));
+    }
+    else{
+      console.log("Local Storage not defined");
+    }
+  },[])
 
   const productDetails = (product:any) => {
     router.push({
@@ -82,7 +86,7 @@ export default function Products() {
     });
   };
 
-  useEffect(() => {
+  /*Fetching the products from the backend*/  useEffect(() => {
     const fetchProducts = async () => {
       try {
         console.log("Session: ",session?.user);
@@ -91,25 +95,16 @@ export default function Products() {
         if (response.status === 200) {
           setNewProducts(response.data);
           setLoad(false);
-          if(typeof window !== undefined){
-            const storedProductImages = localStorage.getItem("product_images") || "{}";
-            if(storedProductImages){
-              setProductImages(JSON.parse(storedProductImages));
-            }
-          }
         }
-        console.log(productImages);
       } catch (error) {
         console.error("Error fetching products:", error);
       }
     };
+
     fetchProducts();
-    if(typeof window !== "undefined"){
-      setProductImages(JSON.parse(localStorage.getItem("product_images") || "{}"));
-    }
   }, []);
 
- 
+  
 
   return (
     <>
@@ -129,7 +124,7 @@ export default function Products() {
         ) : (
           newProducts?.map((product: any, index: number) => (
             <ProductCard key={index}>
-              <ProductImage src={productImages[product?.title] || `${product.title}`} alt="image" />
+              <ProductImage src={productImages && productImages[product?.title] || `${product.title}`} alt="image" />
               <ProductInfoBox>
                 <Title>{product?.title}</Title>
                 <ProductDescription>{getFirst20Words(product?.description)}</ProductDescription>
