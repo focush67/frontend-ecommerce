@@ -69,7 +69,7 @@ export default function ProductBox({ product, imageUrl }: any) {
           _id: product._id,
           title: product.title,
           price: product.price,
-          coverPhoto: Array.isArray(imageUrl) ? imageUrl[0] : imageUrl,
+          coverPhoto: Array.isArray(imageUrl)?imageUrl[1]:imageUrl,
           quantity: 1,
           stripeProductID: product.stripeProductID,
         },
@@ -106,7 +106,7 @@ export default function ProductBox({ product, imageUrl }: any) {
     <div>
       <WhiteBox>
         <div>
-          <Image src={Array.isArray(imageUrl) ? imageUrl[0] : imageUrl} alt={"image"} onError={(e:any) => e.currentTarget.src=fallBackUrl} layout="responsive" height={100} width={100} style={{
+          <Image src={Array.isArray(imageUrl) ? imageUrl[1] : imageUrl} alt={"image"} onError={(e:any) => e.currentTarget.src=fallBackUrl} layout="responsive" height={100} width={100} style={{
             maxWidth: "100%",
             maxHeight: "108px"
           }}/>

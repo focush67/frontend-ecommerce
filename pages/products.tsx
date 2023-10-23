@@ -120,7 +120,7 @@ export default function Products() {
           _id: product._id,
           title: product.title,
           price: product.price,
-          coverPhoto: Array.isArray(imageUrl) ? imageUrl[0] : imageUrl,
+          coverPhoto: Array.isArray(imageUrl) ? imageUrl[1] : imageUrl,
           quantity: 1,
           stripeProductID: product.stripeProductID,
         },
@@ -167,7 +167,7 @@ export default function Products() {
         ) : (
           newProducts?.map((product: any, index: number) => (
             <ProductCard key={index}>
-              <ProductImage src={productImages && productImages[product?.title] || `${product.title}`} alt="image" />
+              <ProductImage src={productImages && productImages[product?.title][1] || `${product.title}`} alt="image" />
               <ProductInfoBox>
                 <Title style={{fontWeight:"bold",fontSize:"1.5rem"}}>{product?.title}</Title>
                 <ProductDescription>{product?.description}</ProductDescription>
