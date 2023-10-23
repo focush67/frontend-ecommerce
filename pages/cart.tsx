@@ -132,10 +132,8 @@ export default function Home() {
     email: session?.user?.email || "",
     address: "",
     phone: "",
-    payment: "Yes",
   });
 
-  const [sessionID,setSessionID] = useState<string>("");
   const handleChange = (e: any) => {
     const { name, value } = e.target;
     setFormData({
@@ -145,7 +143,7 @@ export default function Home() {
   };
 
 
-  const getPriceIdByStripeProductId = async(stripeProductId: string) => {
+   const getPriceIdByStripeProductId = async(stripeProductId: string) => {
     try {
       const stripe = require("stripe")(process.env.NEXT_PUBLIC_STRIPE_PRIVATE_KEY);
       const pricesList = await stripe.prices.list({
@@ -167,11 +165,11 @@ export default function Home() {
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
-    console.log("Form Data: ", formData);
+    //console.log("Form Data: ", formData);
     const stripe = await stripePromise;
     try {
       const stripeResponse = await axios.post("/api/stripe",{
-        formData,
+        email: formData?.email,
         userCart: products,
       });
 
@@ -183,11 +181,10 @@ export default function Home() {
         }
       }))
 
-      console.log("Lineitems: ",lineItems);
-      console.log("Stripe Response Data: ",stripeResponse.data);
+      /*console.log("Lineitems: ",lineItems);
+      console.log("Stripe Response Data: ",stripeResponse.data);*/
 
       const {id} = stripeResponse.data.session;
-      setSessionID(id);
       
       await axios.post("/api/orders",{sessionId:id,
         ...formData,
@@ -197,7 +194,7 @@ export default function Home() {
       localStorage.removeItem("user_cart");
       await emptyCart();
 
-      console.log("UserSessionId: ",id);
+      //console.log("UserSessionId: ",id);
       if(!id)
       {
         return;
@@ -229,8 +226,8 @@ export default function Home() {
       );
       setProducts(response?.data?.userCart || []);
         
-      console.log("CART FROM LOCAL ", cart);
-      console.log("CART FROM BACKEND", response.data);
+     /* console.log("CART FROM LOCAL ", cart);
+      console.log("CART FROM BACKEND", response.data);*/
     };
     fetchCart();
   },[session,cart]);
@@ -242,7 +239,7 @@ export default function Home() {
 
     try {
       const response = await axios.delete("/api/temp", { data: requestBody });
-      console.log("cart empty response", response);
+      //console.log("cart empty response", response);
       clearCart();
       setTimeout(() => {
         router.push("/");
@@ -268,7 +265,7 @@ export default function Home() {
       };
 
       const response = await axios.post("/api/cart", cartData);
-      console.log(response.data);
+      //console.log(response.data);
 
       if (cart[product._id]) {
         setCart((prev: any) => ({
@@ -291,7 +288,7 @@ export default function Home() {
 
   const removeFromCart = async ({ product }: any) => {
     try {
-      console.log(product);
+      //console.log(product);
 
       const response = await axios.delete("/api/cart", {
         data: {
@@ -445,22 +442,6 @@ export default function Home() {
               onChange={handleChange}
               required
             />
-
-            <select
-              name="payment"
-              defaultValue=""
-              value={formData.payment}
-              onChange={handleChange}
-              style={{ height: "2rem" }}
-            >
-              <option value="" disabled>
-                Select Payment Method
-              </option>
-              <option value="creditCard">Credit Card</option>
-              <option value="debitCard">Debit Card</option>
-              
-              {/* Add more payment method options as needed */}
-            </select>
 
             <div style={{ textAlign: "center", fontWeight: "bold" }}>
               Bill : <svg xmlns="http://www.w3.org/2000/svg" height="0.9rem" viewBox="0 0 320 512"><path d="M308 96c6.627 0 12-5.373 12-12V44c0-6.627-5.373-12-12-12H12C5.373 32 0 37.373 0 44v44.748c0 6.627 5.373 12 12 12h85.28c27.308 0 48.261 9.958 60.97 27.252H12c-6.627 0-12 5.373-12 12v40c0 6.627 5.373 12 12 12h158.757c-6.217 36.086-32.961 58.632-74.757 58.632H12c-6.627 0-12 5.373-12 12v53.012c0 3.349 1.4 6.546 3.861 8.818l165.052 152.356a12.001 12.001 0 0 0 8.139 3.182h82.562c10.924 0 16.166-13.408 8.139-20.818L116.871 319.906c76.499-2.34 131.144-53.395 138.318-127.906H308c6.627 0 12-5.373 12-12v-40c0-6.627-5.373-12-12-12h-58.69c-3.486-11.541-8.28-22.246-14.252-32H308z"/></svg>{totalCost.toFixed(2)}

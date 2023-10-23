@@ -13,7 +13,7 @@ export default async function handleStripePayment(
   }
 
   try {
-    const { formData, userCart } = req.body;
+    const { email, userCart } = req.body;
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
@@ -41,7 +41,7 @@ export default async function handleStripePayment(
         };
       }),
       mode: "payment",
-      customer_email: formData.email,
+      customer_email: email,
       success_url: `${process.env.NEXT_PUBLIC_VERCEL_URL}/myorders?success=1`,
       cancel_url: `${process.env.NEXT_PUBLIC_VERCEL_URL}/cart?canceled=1`,
     });

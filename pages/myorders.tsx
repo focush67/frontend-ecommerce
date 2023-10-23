@@ -3,10 +3,14 @@ import Header from "@/components/Header";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { styled } from "styled-components";
+import {loadStripe} from "@stripe/stripe-js";
+import {NeutralButton} from "@/components/Buttons";
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY!);
 
 interface Order{
   _id: string;
   name: string;
+  email: string;
   userCart: any[];
   sessionId: string;
 }
@@ -36,8 +40,10 @@ const TableCell = styled.td`
   border: 2px solid #ccc;
   padding: 1rem;
   box-shadow: #ccc;
-  font-size: 12px;
-  font-weight: bold;
+  font-size: 19px;
+  font-weight: semibold;
+  font-style: italic;
+  text-align: center;
 `;
 
 const CartItemsContainer = styled.div`
@@ -45,34 +51,26 @@ const CartItemsContainer = styled.div`
   align-items: center;
   gap: 8px;
   flex-wrap: wrap;
+  justify-content: center;
 `;
 
 const CartItem = styled.div`
   display: flex;
   align-items: center;
   gap: 2px;
+  justify-content: center;
 `;
 
 const CartItemImage = styled.img`
-  max-width: 40px;
-  max-height: 40px;
-  margin: 3px 3px;
+  max-width: 5em;
+  max-height: 5em;
+  margin: 2px 2px;
 `;
 
 export default function MyOrder() {
   const { data: session } = useSession();
   const [orders, setOrders] = useState<Order[]>([]);
   const [paymentStats,setPaymentStats] = useState<PaymentStats>({});
-  const fetchPaymentStatus = async(userSessionId:string) => {
-    try {
-      const response = await axios.get(`/api/payment-status?userSessionId=${userSessionId}`);
-      
-      return response.data.paymentStatus;
-    } catch (error:any){
-      console.log(error);
-      return "Error";
-    }
-  }
 
   const fetchPaymentStatusForOrder = async(userSessionId:string) => {
     try {
@@ -111,13 +109,33 @@ export default function MyOrder() {
     fetchOrders();
   }, [session]);
 
+  const handleCompletePayment = async(order:Order) => {
+    ///console.log("Event for re-payment received");
+    const stripe = await stripePromise;
+
+    try {
+       
+      const {error} = await stripe?.redirectToCheckout({
+        sessionId: order.sessionId,
+      })!
+
+      if(error)
+      {
+        console.log("Error proceeding to checkout");
+      }
+
+    } catch (error:any){
+      console.log("Error from orders: ",error);
+    }
+  }
+
   return (
     <>
       <Header profile={session?.user} />
       <OrdersTable>
         <thead>
           <tr>
-            <TableHeader>Order ID</TableHeader>
+            <TableHeader>ID</TableHeader>
             <TableHeader>Name</TableHeader>
             <TableHeader>Items</TableHeader>
             <TableHeader>Paid</TableHeader>
@@ -125,9 +143,9 @@ export default function MyOrder() {
         </thead>
 
         <tbody>
-          {orders.map((order: any) => (
-            <TableRow key={order._id}>
-              <TableCell>{order._id}</TableCell>
+          {orders.map((order: any,index:number) => (
+            <TableRow key={index}>
+              <TableCell>{index+1}</TableCell>
               <TableCell>{order.name}</TableCell>
               <TableCell>
                 <CartItemsContainer>
@@ -139,8 +157,13 @@ export default function MyOrder() {
                   ))}
                 </CartItemsContainer>
               </TableCell>
-              
-              <TableCell>{paymentStats[order?.sessionId]}</TableCell>
+              <TableCell>
+                {
+                  paymentStats[order?.sessionId] === "paid" ? "Yes" : (
+                    <NeutralButton size="medium" onClick={() => handleCompletePayment(order)} >Complete Payment</NeutralButton>
+                  )
+                }
+              </TableCell>
             </TableRow>
           ))}
         </tbody>

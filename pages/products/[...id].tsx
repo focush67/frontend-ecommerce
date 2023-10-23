@@ -24,7 +24,7 @@ export default function ProductDetails(){
     const router = useRouter();
     const {id} = router.query;
     const {imageUrl} = router.query;
-    console.log("Image: ",imageUrl);
+    //console.log("Image: ",imageUrl);
     const [product,setProduct] = useState({
        title: String,
        description: String,
@@ -33,7 +33,7 @@ export default function ProductDetails(){
     useEffect(()=>{
         const fetchProduct = async() => {
             const response = await axios.get(`/api/products/?id=${id}`);
-            console.log(response.data);
+            //console.log(response.data);
             setProduct(response.data);
         }
 

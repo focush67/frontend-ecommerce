@@ -1,15 +1,17 @@
 "use client";
 
 import styled from "styled-components";
-import { useSession } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import Header from "@/components/Header";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 
 import { FaSpinner } from "react-icons/fa";
 import axios from "axios";
 import { ProductInfoBox, Title } from "@/components/ProductBox";
-import { NeutralButton } from "@/components/Buttons";
+import PrimaryButton, { NeutralButton } from "@/components/Buttons";
 import { useRouter } from "next/router";
+import { CartContextType } from "@/components/Featured";
+import { CartContext } from "@/components/CartContext";
 
 const ProductWrapper = styled.div`
   display: flex;
@@ -23,12 +25,13 @@ const ProductCard = styled.div`
   background-color: rgba(255, 255, 255, 0.66);
   border-radius: 12px;
   border: 1px solid rgba(209, 213, 219, 0.3);
-  padding: 2em;
+  padding: 2.5rem;
   margin: 0.5rem;
   max-width: 300px; /* Adjust the maximum width as needed */
   flex: 1; /* Distribute cards evenly in a row */
   text-align: center;
-
+  flex-direction: column;
+  display: flex;
   @media (max-width: 768px) {
     padding: 1em;
   }
@@ -39,8 +42,10 @@ const ProductCard = styled.div`
 `;
 
 const ProductImage = styled.img`
-  width: 50%;
+  flex: 1;
+  width: 100%;
   border-radius: 8px;
+  object-fit: contain;
 `;
 
 const ProductDescription = styled.div`
@@ -56,16 +61,12 @@ const ProductDescription = styled.div`
 
 
 export default function Products() {
+  const {cart,setCart} = useContext<CartContextType>(CartContext);
   const {data: session} = useSession();
   const [newProducts, setNewProducts] = useState([]);  
   const [load, setLoad] = useState(true);
   const router = useRouter();
-  function getFirst20Words(inputString:String){
-    const first20words = inputString.match(/\S+/g)?.slice(0,20);
-    const result = first20words?.join(" ");
-    return result;
-  }
-
+  
   const [productImages,setProductsImages] = useState([]);
 
   useEffect(()=>{
@@ -91,7 +92,7 @@ export default function Products() {
       try {
         console.log("Session: ",session?.user);
         const response = await axios.get("/api/products");
-        console.log(response.data);
+        //console.log(response.data);
         if (response.status === 200) {
           setNewProducts(response.data);
           setLoad(false);
@@ -104,6 +105,48 @@ export default function Products() {
     fetchProducts();
   }, []);
 
+  const addToCart = async({product,imageUrl}:any) => {
+    if(!session){
+      await signIn("google");
+      return;
+    }
+
+    try {
+      const cartData = {
+        name: session?.user?.name,
+        email: session?.user?.email,
+        avatar: session?.user?.image,
+        productDetails:{
+          _id: product._id,
+          title: product.title,
+          price: product.price,
+          coverPhoto: Array.isArray(imageUrl) ? imageUrl[0] : imageUrl,
+          quantity: 1,
+          stripeProductID: product.stripeProductID,
+        },
+      };
+
+      console.log("Frontend: ",cartData);
+      const response = await axios.post("/api/cart",cartData);
+      console.log(response.data);
+      if(cartData.productDetails._id in cart){
+        setCart((prev:any) => ({
+          ...prev,
+          [cartData.productDetails._id]: prev[cartData.productDetails._id] + 1,
+        }));
+      }
+
+      else{
+        setCart((prev:any) => ({
+          ...prev,
+          [cartData.productDetails._id]: 1,
+        }));
+      }
+
+    } catch (error:any){
+      console.log(error.message);
+    }
+  }
   
 
   return (
@@ -126,9 +169,15 @@ export default function Products() {
             <ProductCard key={index}>
               <ProductImage src={productImages && productImages[product?.title] || `${product.title}`} alt="image" />
               <ProductInfoBox>
-                <Title>{product?.title}</Title>
-                <ProductDescription>{getFirst20Words(product?.description)}</ProductDescription>
+                <Title style={{fontWeight:"bold",fontSize:"1.5rem"}}>{product?.title}</Title>
+                <ProductDescription>{product?.description}</ProductDescription>
+                <div style={{
+                  display:"flex",
+                  justifyContent:"center",
+                }}>
                 <NeutralButton size={"medium"} onClick={()=>productDetails(product)}>Learn More</NeutralButton>
+                <PrimaryButton size={"medium"} onClick={() => addToCart({product,imageUrl : productImages[product?.title]})}>Add to Cart</PrimaryButton>
+                </div>
               </ProductInfoBox>
             </ProductCard>
           ))
