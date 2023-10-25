@@ -9,5 +9,16 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_APP_ID,
 };
 
-const app = initializeApp(firebaseConfig);
-export const storage = getStorage(app);
+const categoryConfig = {
+  apiKey: "AIzaSyBAruxlNWXyaxHrpCTcVUe4N59xoF7nChg",
+  authDomain: "categories-admin-panel.firebaseapp.com",
+  projectId: "categories-admin-panel",
+  storageBucket: "categories-admin-panel.appspot.com",
+  messagingSenderId: "455030907006",
+  appId: "1:455030907006:web:0e1f2869e0835061ea782f"
+};
+
+const productApp = initializeApp(firebaseConfig,"products");
+const categoryApp = initializeApp(categoryConfig,"categories");
+export const productStorage = getStorage(productApp);
+export const categoryStorage = getStorage(categoryApp);

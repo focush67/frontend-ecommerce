@@ -334,7 +334,7 @@ export default function Home() {
 
   return (
     <>
-      <Header profile={session?.user} />
+    <Header profile={session?.user} />
       <PageContainer>
         <TableContainer>
           <Table>

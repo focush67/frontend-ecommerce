@@ -3,7 +3,7 @@ import { Column } from "./Featured";
 import ProductBox from "./ProductBox";
 import { useEffect, useState } from "react";
 import { FaSpinner } from "react-icons/fa";
-import fetchImages from "@/components/ImageLoader";
+import fetchImages from "@/components/ImageLoaderForProducts";
 export const ProductsGrid = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr 1fr 1fr;
@@ -39,11 +39,13 @@ export default function NewProducts({ newProducts }: any) {
       setImages(imagesUrls);
     }
 
+   
     imageFetching();
+    
     setLoad(false);
-
     setImagesLS(JSON.parse(localStorage.getItem("product_images") || ""));
-  },[newProducts])
+    
+  },[newProducts]);
 
   return (
     <>

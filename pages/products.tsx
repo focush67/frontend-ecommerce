@@ -13,7 +13,7 @@ import { useRouter } from "next/router";
 import { CartContextType } from "@/components/Featured";
 import { CartContext } from "@/components/CartContext";
 
-const ProductWrapper = styled.div`
+export const ProductWrapper = styled.div`
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
@@ -21,7 +21,7 @@ const ProductWrapper = styled.div`
   margin: 0.5rem;
 `;
 
-const ProductCard = styled.div`
+export const ProductCard = styled.div`
   background-color: rgba(255, 255, 255, 0.66);
   border-radius: 12px;
   border: 1px solid rgba(209, 213, 219, 0.3);
@@ -41,14 +41,14 @@ const ProductCard = styled.div`
   }
 `;
 
-const ProductImage = styled.img`
+export const ProductImage = styled.img`
   flex: 1;
   width: 100%;
   border-radius: 8px;
   object-fit: contain;
 `;
 
-const ProductDescription = styled.div`
+export const ProductDescription = styled.div`
   font-size: 15px;
   margin: 10px 0;
   white-space: nowrap;
@@ -151,7 +151,7 @@ export default function Products() {
 
   return (
     <>
-      <Header profile={session?.user} />
+    <Header profile={session?.user} />
       <ProductWrapper>
         {load ? (
           <div

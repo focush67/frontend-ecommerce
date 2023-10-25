@@ -2,7 +2,7 @@ import styled from "styled-components";
 import Center from "./Center";
 import PrimaryButton, { NeutralButton } from "./Buttons";
 import { ref, listAll, getDownloadURL } from "firebase/storage";
-import { storage } from "@/firebaseConfig";
+import { productStorage } from "@/firebaseConfig";
 import { useEffect, useState, useContext } from "react";
 import Cart from "./CartIcon";
 import { CartContext } from "./CartContext";
@@ -57,7 +57,7 @@ export const Column = styled.div`
 export default function Featured({ featuredProduct }: any) {
   const [imageUrl, setImageUrl] = useState("");
   const { data: session } = useSession();
-  const imageListReference = ref(storage, `${featuredProduct?.title}/`);
+  const imageListReference = ref(productStorage, `${featuredProduct?.title}/`);
   const { cart, setCart } = useContext<CartContextType>(CartContext);
   useEffect(() => {
     listAll(imageListReference)

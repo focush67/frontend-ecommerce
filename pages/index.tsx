@@ -7,12 +7,29 @@ import NewProducts from "@/components/NewProducts";
 import { useSession, getSession } from "next-auth/react";
 import axios from "axios";
 import { CartContext } from "@/components/CartContext";
-import fetchImages from "../components/ImageLoader";
-
-export default function Home({ featuredProduct, newProducts }: any) {
+import fetchImages from "../components/ImageLoaderForProducts";
+import { fetchCategoryImages } from "@/components/ImageLoaderForCategory";
+export default function Home({ featuredProduct, newProducts,categories }: any) {
   const [latest, setLatest] = useState(newProducts);
   const { data: session } = useSession();
   const { cart, setCart } = useContext(CartContext);
+  const [categ,setCateg] = useState(categories);
+
+  useEffect(()=>{
+    const fetchCategories = async() => {
+      try {
+        const response = await axios.get("/api/categories");
+        if(response.data.categories){
+          setCateg(response.data.categories);
+          fetchCategoryImages(response.data.categories);
+        }
+      } catch (error:any){
+        console.log(error.message);
+      }
+    }
+
+    fetchCategories();
+  },[])
 
   useEffect(() => {
     const fetchNewProducts = async () => {
@@ -57,7 +74,6 @@ export default function Home({ featuredProduct, newProducts }: any) {
           }));
         }
 
-        //console.log("CART: ",userCart);
       } catch (error: any) {
         console.log(error);
       }
@@ -69,7 +85,7 @@ export default function Home({ featuredProduct, newProducts }: any) {
   if (session) {
     return (
       <>
-          <Header profile={session?.user}/>
+          <Header profile={session?.user} />
           <Featured featuredProduct={featuredProduct} />
           <NewProducts newProducts={newProducts} />
       </>
@@ -78,7 +94,7 @@ export default function Home({ featuredProduct, newProducts }: any) {
 
   return (
     <>
-        <Header profile={null}/>
+        <Header profile={null} />
         <Featured featuredProduct={featuredProduct} />
         <NewProducts newProducts={newProducts} />
     </>
@@ -92,11 +108,12 @@ export async function getServerSideProps() {
 
   const featuredProduct = await Product.findById(featuredProductID);
   const newProducts = await Product.find({}, null, { sort: { updatedAt: -1 } });
-
+  
   return {
     props: {
       newProducts: JSON.parse(JSON.stringify(newProducts)),
       featuredProduct: JSON.parse(JSON.stringify(featuredProduct)),
+      
     },
   };
 }

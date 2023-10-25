@@ -24,7 +24,6 @@ export default function ProductDetails(){
     const router = useRouter();
     const {id} = router.query;
     const {imageUrl} = router.query;
-    //console.log("Image: ",imageUrl);
     const [product,setProduct] = useState({
        title: String,
        description: String,

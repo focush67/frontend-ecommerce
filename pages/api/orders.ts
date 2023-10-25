@@ -12,17 +12,16 @@ export default async function handle(
   mongooseConnect();
 
   if (method === "GET") {
-    if(request?.query?.email)
-    {
-      console.log("Order request for email: ",request.query.email);
+    if (request?.query?.email) {
+      console.log("Order request for email: ", request.query.email);
       try {
-        return response.json(await Order.find({email: request.query.email}));
-      } catch (error:any){
+        return response.json(await Order.find({ email: request.query.email }));
+      } catch (error: any) {
         console.log(error.message);
         return response.json({
           message: `${error.message}`,
           status: error.status,
-        })
+        });
       }
     }
     return response.json(await Order.find().populate("userCart"));
@@ -30,7 +29,16 @@ export default async function handle(
 
   if (method === "POST") {
     try {
-      const { sessionId,name, email, address, phone, payment, userCart,amount } = request.body;
+      const {
+        sessionId,
+        name,
+        email,
+        address,
+        phone,
+        payment,
+        userCart,
+        amount,
+      } = request.body;
       const orderID = new mongoose.Types.ObjectId();
 
       await Order.create({
@@ -53,6 +61,32 @@ export default async function handle(
       });
     } catch (error: any) {
       console.log(error);
+    }
+  }
+
+  if (method === "DELETE") {
+    const { id } = request?.query;
+    if (id) {
+      try {
+        const deletedOrder = await Order.findByIdAndDelete({ _id: id });
+        if (deletedOrder) {
+          return response.json({
+            message: "Order deleted successfully",
+            status: 200,
+          });
+        } else {
+          return response.json({
+            message: "Order not found",
+            status: 404,
+          });
+        }
+      } catch (error: any) {
+        console.log(error);
+        return response.json({
+          message: "Error deleting Order",
+          status: 501,
+        });
+      }
     }
   }
 

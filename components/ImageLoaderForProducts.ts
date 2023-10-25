@@ -1,11 +1,11 @@
 import {ref,listAll,getDownloadURL} from "firebase/storage";
-import {storage} from "@/firebaseConfig";
+import {productStorage} from "@/firebaseConfig";
 
-interface ImageCache{
+export interface ImageCache{
     [key: string]: string[],
 }
 
-interface ProductImagesMap{
+export interface ProductImagesMap{
     [key:string]: string[];
 }
 
@@ -21,7 +21,7 @@ export default async function fetchImages(newProducts:any[]){
         }
 
         else{
-            const imageRef = ref(storage,`${product.imagesFolder}/`);
+            const imageRef = ref(productStorage,`${product.imagesFolder}/`);
             try {
                 const response = await listAll(imageRef);
                 const downloadPromises = response.items.map(async (item:any) => {

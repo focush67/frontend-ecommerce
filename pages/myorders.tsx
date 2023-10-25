@@ -32,12 +32,12 @@ const TableHeader = styled.th`
 `;
 
 const TableRow = styled.tr`
-  border: 3px solid #ccc;
+  border: 1px solid #ccc;
   background-color: rgba;
 `;
 
 const TableCell = styled.td`
-  border: 2px solid #ccc;
+  border: 0.5px solid #ccc;
   padding: 1rem;
   box-shadow: #ccc;
   font-size: 19px;
@@ -93,6 +93,8 @@ export default function MyOrder() {
     fetchPaymentStatiForCart();
   } ,[orders])
 
+
+  useEffect(()=>{},[orders])
   useEffect(() => {
     const fetchOrders = async () => {
       try {
@@ -129,9 +131,18 @@ export default function MyOrder() {
     }
   }
 
+  const handleDeleteOrder = async(order:Order) => {
+    try {
+      const response = await axios.delete(`/api/orders?id=${order._id}`);
+      console.log(response.data);
+    } catch (error:any){
+      console.log(error.message);
+    }
+  }
+
   return (
     <>
-      <Header profile={session?.user} />
+    <Header profile={session?.user} />
       <OrdersTable>
         <thead>
           <tr>
@@ -151,7 +162,7 @@ export default function MyOrder() {
                 <CartItemsContainer>
                   {order.userCart?.map((item: any) => (
                     <CartItem key={item._id}>
-                      <CartItemImage key={item._id} src={item.coverPhoto} />
+                      <CartItemImage key={item._id} src={item.coverPhoto}/>
                       <p>{item?.quantity}</p>
                     </CartItem>
                   ))}
@@ -160,7 +171,10 @@ export default function MyOrder() {
               <TableCell>
                 {
                   paymentStats[order?.sessionId] === "paid" ? "Yes" : (
+                    <>
                     <NeutralButton size="medium" onClick={() => handleCompletePayment(order)} >Complete Payment</NeutralButton>
+                    <NeutralButton size="medium" onClick={() => handleDeleteOrder(order)} >Delete</NeutralButton>
+                    </>
                   )
                 }
               </TableCell>
