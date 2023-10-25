@@ -83,6 +83,7 @@ export default function Products() {
       pathname: `/products/${product._id}`,
       query:{
         imageUrl: productImages[product?.title][0],
+        properties: product.properties,
       }
     });
   };
@@ -92,7 +93,7 @@ export default function Products() {
       try {
         console.log("Session: ",session?.user);
         const response = await axios.get("/api/products");
-        //console.log(response.data);
+        console.log(response.data);
         if (response.status === 200) {
           setNewProducts(response.data);
           setLoad(false);
