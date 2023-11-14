@@ -80,7 +80,7 @@ export default function Home({ featuredProduct, newProducts,categories }: any) {
     };
 
     fetchCartData();
-  },[cart,setCart]);
+  },[]);
 
   if (session) {
     return (

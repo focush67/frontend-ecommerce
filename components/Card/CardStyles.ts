@@ -10,6 +10,14 @@ export const CardWrapper = styled.div`
   box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.9);
   text-align: center;
   padding: 2rem;
+
+  @media (max-width: 700px) {
+    grid-template-areas:
+      'image'
+      'text'
+      'stats';
+    grid-template-columns: 1fr;
+  }
 `;
 
 export const CardImage = styled.div<{ background: string }>`
@@ -19,9 +27,15 @@ export const CardImage = styled.div<{ background: string }>`
   border-top-right-radius: 0;
   background-size: contain;
   background-repeat: no-repeat;
-  background-position: center center;
   width: 100%;
   height: 100%;
+  background-position: center;
+
+  @media (max-width: 700px) {
+    border-top-left-radius: 1rem;
+    border-top-right-radius: 1rem;
+  }
+
 `;
 
 export const CardTextWrapper = styled.div`

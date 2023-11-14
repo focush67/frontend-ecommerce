@@ -16,9 +16,9 @@ export const Card = ({ title, description , price , imgUrl, properties}: any) =>
   return (
     <Tilt>
       <CardWrapper>
-        <CardImage background={imgUrl} />
-        <CardTextTitle>₹ {price}</CardTextTitle>
+        <CardImage background={imgUrl}  />
         <CardTextWrapper>
+          <CardTextTitle>₹ {price}</CardTextTitle>
           <CardTextTitle>{title}</CardTextTitle>
           <CardTextBody>{description}</CardTextBody>
         </CardTextWrapper>

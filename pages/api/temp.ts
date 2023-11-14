@@ -1,5 +1,4 @@
 import mongooseConnect from "@/lib/mongoose";
-import mongoose from "mongoose";
 import { NextApiRequest,NextApiResponse } from "next";
 import { Cart } from "@/lib/models/CartSchema";
 

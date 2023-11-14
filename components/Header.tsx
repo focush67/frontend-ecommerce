@@ -56,9 +56,10 @@ const StyledNav = styled.nav`
 const HiMenuWrapper = styled.div`
   display: none;
   @media (max-width: 550px) {
-    display: block;
+    display: flex;
   }
 `;
+
 const ProfileInfo = styled.div`
   display: flex;
   align-items: center;
@@ -104,7 +105,28 @@ export default function Header({ profile, initialTotalItems }: any) {
         <Center>
           <Wrapper>
             <Logo href={"/"}>ECommerce</Logo>
-            <HiMenuWrapper>
+            <HiMenuWrapper style={{
+              alignItems:"center",
+              gap:"0.2em"
+            }}>
+              <Logo
+                href={"/cart"}
+                className="cart"
+                disablepointerevents={totalItems === 0}
+              >
+                Cart ({totalItems || 0})
+              </Logo>
+              {
+                profile ? (
+                  <ProfileInfoWrapper>
+                  <ProfileInfo>
+                    <Avatar src={profile?.image} alt="A" />
+                  </ProfileInfo>
+                </ProfileInfoWrapper>
+                ) : (
+                    null
+                )
+              }
               <HiMenu
                 style={{
                   color: "white",
@@ -120,6 +142,9 @@ export default function Header({ profile, initialTotalItems }: any) {
                 href={"/cart"}
                 className="cart"
                 disablepointerevents={totalItems === 0}
+                style={{
+                  fontSize:"90%"
+                }}
               >
                 Cart ({totalItems || 0})
               </Logo>
