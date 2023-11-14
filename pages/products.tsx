@@ -101,11 +101,7 @@ export default function Products() {
       pathname: `/products/${product._id}`,
       query:{
         imageUrl: productImages[product?.title][0],
-<<<<<<< HEAD
-        properties: product?.properties,
-=======
         properties: product.properties,
->>>>>>> 0abbb918e9624cd0b37df8711dcaa3ec0326bf9f
       }
     });
   };
