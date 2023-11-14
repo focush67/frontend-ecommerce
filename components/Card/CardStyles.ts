@@ -2,29 +2,48 @@ import styled from "styled-components";
 
 export const CardWrapper = styled.div`
   display: grid;
-  grid-template-columns: 100%;
-  grid-template-rows: 210px 210px 80px;
-  grid-template-areas: "image" "text" "stats";
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto auto;
+  grid-template-areas: "image text" "image stats";
   border-radius: 18px;
   background: #000;
   box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.9);
   text-align: center;
   padding: 2rem;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+
+  @media (min-width: 600px) {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto;
+    grid-template-areas: "image text" "image stats";
+  }
 `;
 
 export const CardImage = styled.div<{ background: string }>`
   grid-area: image;
   background-image: url(${({ background }) => background});
   border-top-left-radius: 1rem;
-  border-top-right-radius: 1.5rem;
+  border-top-right-radius: 0;
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center center;
+  width: 100%;
+  height: 100%;
 `;
 
 export const CardTextWrapper = styled.div`
   grid-area: text;
-  margin: 25px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  max-height: 60vh;
+  justify-content: space-around;
+
+  @media (min-width: 600px) {
+    padding-left: 1rem;
+  }
 `;
 
 export const CardTextDate = styled.span`
@@ -39,7 +58,7 @@ export const CardTextTitle = styled.h2`
   min-width: 0px;
   line-height: 1.2;
   margin: 0px;
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
   background: linear-gradient(
     110.78deg,
     rgb(118, 230, 80) -1.13%,
@@ -60,30 +79,54 @@ export const CardTextBody = styled.p`
   color: grey;
   font-size: 15px;
   font-weight: 300;
+  white-space: normal;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 `;
 
 export const CardStatWrapper = styled.div`
   grid-area: stats;
-  display: grid;
-  /* grid-template-columns: 1fr 1fr 1fr; */
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr;
-
-  border-bottom-left-radius: 15px;
-  border-bottom-right-radius: 15px;
-  margin-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
 `;
 
 export const CardStats = styled.div`
   display: flex;
-  align-items: center;
-  justify-content: center;
+  align-items: flex-start;
+  justify-content: flex-start;
   flex-direction: column;
   color: white;
-  padding: 10px;
 `;
 
 export const LinkText = styled.a`
   color: #fff;
   text-decoration: none;
 `;
+
+export const PropertyWrapper = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  padding: 1px;
+`;
+
+export const PropertyName = styled.div`
+  display: flex;
+  font-size: large;
+  font-weight: bold;
+  color: transparent;
+  color: #ccc;
+  align-items: center;
+  margin-bottom: 0.5em;
+`;
+
+export const PropertyValue = styled.div`
+  align-items: center;
+  margin-left: 1em;
+  margin-bottom: 0.5em;
+  font-size: large;
+  color: gray;
+`

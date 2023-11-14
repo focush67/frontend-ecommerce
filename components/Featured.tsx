@@ -27,7 +27,7 @@ export const Bg = styled.div`
 export const Title = styled.h1`
   margin: 0;
   font-weight: normal;
-  font-size: 3rem;
+  font-size: 250%;
 `;
 
 export const Description = styled.p`
@@ -127,10 +127,10 @@ export default function Featured({ featuredProduct }: any) {
               <Title>{featuredProduct?.title}</Title>
               <Description>{featuredProduct?.description}</Description>
               <Column>
-                <NeutralButton size="large">Read More</NeutralButton>
+                <NeutralButton size="large">More</NeutralButton>
                 <PrimaryButton size="large" onClick={(e: React.MouseEvent<HTMLButtonElement>) => addFeaturedProductToCart()}>
                   <Cart />
-                  Add to Cart
+                  Add
                 </PrimaryButton>
               </Column>
             </div>

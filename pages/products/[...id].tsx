@@ -28,6 +28,7 @@ export default function ProductDetails(){
        title: String,
        description: String,
        price: String, 
+       properties: [],
     });
     useEffect(()=>{
         const fetchProduct = async() => {
@@ -42,7 +43,7 @@ export default function ProductDetails(){
     return(
         <div>
             <CardContainer>
-                <Card title={product.title} description={product?.description} price={product?.price} imgUrl={imageUrl}/>
+                <Card title={product.title} description={product?.description} price={product?.price} imgUrl={imageUrl} properties={product?.properties}/>
                 <Separator/>
             </CardContainer>
         </div>

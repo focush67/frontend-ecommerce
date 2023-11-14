@@ -7,10 +7,11 @@ import {CartContextType} from './Featured';
 import {signIn, useSession} from "next-auth/react";
 import Image from "next/image";
 import CartIcon from "./CartIcon";
+
 export const WhiteBox = styled.div`
   background-color: #fff;
   padding: 20px;
-  height: 120px;
+  width: auto;
   text-align: center;
   display: flex;
   align-items: center;
@@ -26,18 +27,19 @@ export const Title = styled.h2`
 
 export const ProductInfoBox = styled.div`
   text-align: center;
-  margin-top: 5px;
+  margin: 5px auto;
+
 `;
 
 export const PriceRow = styled.div`
   display: flex;
   align-items: center;
-  justify-content: space-around;
+  justify-content: center;
   margin-top:2px;
 `;
 
 export const Price = styled.div`
-    font-size: 1.3rem;
+    font-size: 110%;
     font-weight: bold;
     display: flex;
     align-items: center;

@@ -1,8 +1,8 @@
 import axios from "axios";
 import {useRouter} from "next/router";
 import { useContext, useEffect,useState } from "react";
-import {ProductCard,ProductDescription,ProductImage,ProductWrapper} from "@/pages/products";
-import { ProductInfoBox,Title } from "@/components/ProductBox";
+import {ProductCard,ProductDescription,ProductImage,ProductInfoBoxHere,ProductWrapper} from "@/pages/products";
+import { Title } from "@/components/ProductBox";
 import Header from "@/components/Header";
 import {useSession,signIn} from "next-auth/react";
 import PrimaryButton, { NeutralButton } from "@/components/Buttons";
@@ -111,7 +111,7 @@ export default function CategoryProducts(){
           products?.map((product: any, index: number) => (
             <ProductCard key={index}>
               <ProductImage src={productImages && productImages[product?.title][1] || `${product.title}`} alt="image" />
-              <ProductInfoBox>
+              <ProductInfoBoxHere>
                 <Title style={{fontWeight:"bold",fontSize:"1.5rem"}}>{product?.title}</Title>
                 <ProductDescription>{product?.description}</ProductDescription>
                 <div style={{
@@ -121,7 +121,7 @@ export default function CategoryProducts(){
                 <NeutralButton size={"medium"} onClick={()=>productDetails(product)}>Learn More</NeutralButton>
                 <PrimaryButton size={"medium"} onClick={() => addToCart({product,imageUrl : productImages[product?.title]})}>Add to Cart</PrimaryButton>
                 </div>
-              </ProductInfoBox>
+              </ProductInfoBoxHere>
             </ProductCard>
           ))
         }

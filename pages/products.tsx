@@ -59,6 +59,24 @@ export const ProductDescription = styled.div`
   line-height: 1.5;
 `;
 
+export const ProductInfoBoxHere = styled.div`
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 1em; /* Adjust padding as needed */
+
+  /* Add a margin to create space between the image and text */
+  margin-top: 10px;
+
+  /* Adjust the following styles for the product description */
+  font-size: 15px;
+  line-height: 1.5;
+  white-space: normal;
+  height: auto;
+  overflow: hidden;
+`;
+
 
 export default function Products() {
   const {cart,setCart} = useContext<CartContextType>(CartContext);
@@ -83,6 +101,7 @@ export default function Products() {
       pathname: `/products/${product._id}`,
       query:{
         imageUrl: productImages[product?.title][0],
+        properties: product?.properties,
       }
     });
   };
@@ -168,7 +187,7 @@ export default function Products() {
           newProducts?.map((product: any, index: number) => (
             <ProductCard key={index}>
               <ProductImage src={productImages && productImages[product?.title][1] || `${product.title}`} alt="image" />
-              <ProductInfoBox>
+              <ProductInfoBoxHere>
                 <Title style={{fontWeight:"bold",fontSize:"1.5rem"}}>{product?.title}</Title>
                 <ProductDescription>{product?.description}</ProductDescription>
                 <div style={{
@@ -178,7 +197,7 @@ export default function Products() {
                 <NeutralButton size={"medium"} onClick={()=>productDetails(product)}>Learn More</NeutralButton>
                 <PrimaryButton size={"medium"} onClick={() => addToCart({product,imageUrl : productImages[product?.title]})}>Add to Cart</PrimaryButton>
                 </div>
-              </ProductInfoBox>
+              </ProductInfoBoxHere>
             </ProductCard>
           ))
         )}

@@ -4,10 +4,20 @@ import ProductBox from "./ProductBox";
 import { useEffect, useState } from "react";
 import { FaSpinner } from "react-icons/fa";
 import fetchImages from "@/components/ImageLoaderForProducts";
+
 export const ProductsGrid = styled.div`
+  margin: auto auto;
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr;
+  grid-template-columns: auto auto auto;
   gap: 20px;
+  overflow-x: hidden;
+  @media (max-width:550px){
+    grid-template-columns: auto auto;
+  }
+
+  @media (max-width:397px){
+    grid-template-columns: auto;
+  }
 `;
 
 export const Wrapper = styled.div`

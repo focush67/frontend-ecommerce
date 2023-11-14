@@ -15,15 +15,18 @@ const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY || " 
 
 
 const PageContainer = styled.div`
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: auto auto;
   padding: 20px;
   gap: 20px;
   overflow: hidden;
+
+  @media (max-width:669px){
+    grid-template-columns: auto;
+  }
 `;
 
 const TableContainer = styled.div`
-  flex: 1.5;
   background-color: #f5f5f5;
   padding: 20px;
   border-radius: 8px;
@@ -324,7 +327,7 @@ export default function Home() {
 
   useEffect(() => {
     const initialTotalCost = filteredProducts.reduce(
-      (acc, prod:any) => acc + (parseFloat(prod?.price) || 0) * Number(cart[prod?._id]),
+      (acc:number, prod:any) => acc + (parseFloat(prod?.price) || 0) * Number(cart[prod?._id]),
       0
     );
 
