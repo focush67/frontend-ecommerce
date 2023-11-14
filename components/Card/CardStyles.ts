@@ -10,14 +10,6 @@ export const CardWrapper = styled.div`
   box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.9);
   text-align: center;
   padding: 2rem;
-  word-wrap: break-word;
-  overflow-wrap: break-word;
-
-  @media (min-width: 600px) {
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: auto;
-    grid-template-areas: "image text" "image stats";
-  }
 `;
 
 export const CardImage = styled.div<{ background: string }>`
@@ -34,16 +26,7 @@ export const CardImage = styled.div<{ background: string }>`
 
 export const CardTextWrapper = styled.div`
   grid-area: text;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  height: 100%;
-  max-height: 60vh;
-  justify-content: space-around;
-
-  @media (min-width: 600px) {
-    padding-left: 1rem;
-  }
+  margin: 25px;
 `;
 
 export const CardTextDate = styled.span`
@@ -52,7 +35,6 @@ export const CardTextDate = styled.span`
 `;
 
 export const CardTextTitle = styled.h2`
-  margin-top: 0px;
   font-size: 2rem;
   box-sizing: border-box;
   min-width: 0px;
@@ -72,7 +54,6 @@ export const CardTextTitle = styled.h2`
   background-clip: text;
   -webkit-background-clip: text;
   color: transparent;
-  
 `;
 
 export const CardTextBody = styled.p`

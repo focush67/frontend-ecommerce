@@ -16,6 +16,7 @@ interface Product{
     price: string;
     stripeProductID: string;
 }
+
 export default function CategoryProducts(){
     const {cart,setCart} = useContext<CartContextType>(CartContext);
     const router = useRouter();
