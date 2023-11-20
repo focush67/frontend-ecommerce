@@ -4,6 +4,7 @@ import ProductBox from "./ProductBox";
 import { useEffect, useState } from "react";
 import { FaSpinner } from "react-icons/fa";
 import fetchImages from "@/components/ImageLoaderForProducts";
+import { ProductType } from "@/lib/GlobalTypes";
 
 export const ProductsGrid = styled.div`
   margin: auto auto;
@@ -33,7 +34,7 @@ const StyledHeader = styled.h2`
   font-family: Verdana, Geneva, Tahoma, sans-serif;
 `;
 
-export default function NewProducts({ newProducts }: any) {
+export default function NewProducts({ newProducts }: {newProducts:ProductType[]}) {
   
   const [load, setLoad] = useState(true);
   const [images,setImages] = useState<any>([{}]);

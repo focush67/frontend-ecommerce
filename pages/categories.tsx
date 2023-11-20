@@ -5,6 +5,7 @@ import React, { useEffect, useState } from 'react'
 import styled from 'styled-components';
 import {useSession} from "next-auth/react";
 import {useRouter} from "next/router";
+import { Category } from '@/lib/GlobalTypes';
 const CategoryWrapper = styled.div`
   display: flex;
   flex-wrap: wrap;
@@ -52,12 +53,6 @@ const CategoryImage = styled.img`
   border-radius: 8px;
   object-fit: contain;
 `;
-
-interface Category{
-  name: string;
-  parent: null;
-  properties:any[];
-}
 3
 const Categories = () => {
   const {data: session} = useSession();

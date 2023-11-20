@@ -1,12 +1,5 @@
 import styled, { css } from "styled-components";
 
-interface ButtonProps{
-  children: React.ReactNode;
-  background: string;
-  size: "small" | "medium" | "large";
-  onClick: (e: React.MouseEvent<HTMLButtonElement>) => void;
-}
-
 const buttonStyles = css`
   display: inline-flex;
   background-color: ${(props:any) => props.background || "blue"};
@@ -45,7 +38,7 @@ const buttonStyles = css`
     `}
 `;
 
-const StyledButtonPrimary = styled.button<ButtonProps>`
+const StyledButtonPrimary = styled.button`
   ${buttonStyles};
   background-color: ${(props:any) => props.background === "white" ? "transparent" : props.background};
   border: ${(props:any) => props.background === "white" ? "2px solid blue" : "none"};
@@ -53,7 +46,7 @@ const StyledButtonPrimary = styled.button<ButtonProps>`
   
 `;
 
-const StyledButtonNeutral = styled.button<ButtonProps>`
+const StyledButtonNeutral = styled.button`
   ${buttonStyles};
   background-color: #000;
   color: #f3eaea;

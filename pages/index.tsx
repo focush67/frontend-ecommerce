@@ -1,5 +1,5 @@
-import { Product } from "@/lib/models/ProductSchema";
 import Header from "@/components/Header";
+import { Product } from "@/lib/models/ProductSchema";
 import { useState, useEffect, useContext } from "react";
 import Featured from "@/components/Featured";
 import mongooseConnect from "@/lib/mongoose";
@@ -9,7 +9,10 @@ import axios from "axios";
 import { CartContext } from "@/components/CartContext";
 import fetchImages from "../components/ImageLoaderForProducts";
 import { fetchCategoryImages } from "@/components/ImageLoaderForCategory";
-export default function Home({ featuredProduct, newProducts,categories }: any) {
+import { Category,ProductType } from "@/lib/GlobalTypes";
+export default function Home({ featuredProduct, newProducts,categories }: {
+  featuredProduct: ProductType,newProducts: ProductType[],categories:Category[]
+}) {
   const [latest, setLatest] = useState(newProducts);
   const { data: session } = useSession();
   const { cart, setCart } = useContext(CartContext);

@@ -7,6 +7,7 @@ import { signIn, signOut } from "next-auth/react";
 import PrimaryButton, { NeutralButton } from "./Buttons";
 import { HiMenu } from "react-icons/hi";
 import Drawer from "@mui/material/Drawer";
+import { UserProfile } from "@/lib/GlobalTypes";
 
 const StyledHeader = styled.header`
   background-color: #000;
@@ -82,7 +83,7 @@ const ProfileInfoWrapper = styled.div<{ signedIn?: boolean }>`
   pointer-events: ${({ signedIn }) => (signedIn ? "none" : "auto")};
 `;
 
-export default function Header({ profile, initialTotalItems }: any) {
+export default function Header({ profile, initialTotalItems }: {profile: UserProfile,initialTotalItems:number}) {
   const [open, setOpen] = useState(false);
   const { cart, clearCart } = useContext(CartContext);
   const signOutAndClearStorage = async () => {

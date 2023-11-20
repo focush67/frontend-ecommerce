@@ -7,6 +7,7 @@ import {CartContextType} from './Featured';
 import {signIn, useSession} from "next-auth/react";
 import Image from "next/image";
 import CartIcon from "./CartIcon";
+import { ProductType } from "@/lib/GlobalTypes";
 
 export const WhiteBox = styled.div`
   background-color: #fff;
@@ -49,7 +50,7 @@ export const Price = styled.div`
     }
 `
 
-export default function ProductBox({ product, imageUrl }: any) {
+export default function ProductBox({ product, imageUrl }: {product:ProductType,imageUrl:string|string[]}) {
 
   const {setCart,cart} = useContext<CartContextType>(CartContext);
   const fallBackUrl =  "https://picsum.photos/id/237/200/300";

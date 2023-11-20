@@ -1,8 +1,9 @@
+import { CartContextType } from "@/lib/GlobalTypes";
 import { createContext, useState, useEffect } from "react";
 
 export const CartContext = createContext<any>({});
 
-export function CartContextProvider({children}:{children:any}) {
+export function CartContextProvider({children}:CartContextType) {
   const getLocalStorage = () => {
     if (typeof window !== "undefined") {
       const ls = window.localStorage;

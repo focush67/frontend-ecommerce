@@ -11,6 +11,8 @@ import axios from "axios";
 import { signIn, useSession } from "next-auth/react";
 import Image from "next/image";
 import { useRouter } from "next/router";
+import { ProductType } from "@/lib/GlobalTypes";
+
 export type CartContextType = {
   addToCart: (productID: ObjectId) => void;
   cart: ObjectId[];
@@ -55,7 +57,7 @@ export const Column = styled.div`
   margin: 2rem 0 0 0;
 `;
 
-export default function Featured({ featuredProduct }: any) {
+export default function Featured({ featuredProduct }: {featuredProduct:ProductType}) {
   const router = useRouter();
   const [imageUrl, setImageUrl] = useState("");
   const { data: session } = useSession();
@@ -115,7 +117,7 @@ export default function Featured({ featuredProduct }: any) {
       const response = await axios.post("/api/cart", cartData);
       console.log(response.data);
 
-      if (cart[featuredProduct._id]) {
+      if (cart[Number(featuredProduct._id)]) {
         setCart((prev: any) => ({
           ...prev,
           [featuredProduct._id]: prev[featuredProduct._id] + 1,
