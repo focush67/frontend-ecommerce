@@ -51,9 +51,9 @@ export default function NewProducts({ newProducts }: any) {
 
    
     imageFetching();
-    
+    const products_images_from_LS = (localStorage.getItem("product_images"));
     setLoad(false);
-    setImagesLS(JSON.parse(localStorage.getItem("product_images") || ""));
+    setImagesLS(( products_images_from_LS ? JSON.parse(products_images_from_LS) : null));
     
   },[newProducts]);
 

@@ -10,6 +10,7 @@ import { ObjectId } from "mongoose";
 import axios from "axios";
 import { signIn, useSession } from "next-auth/react";
 import Image from "next/image";
+import { useRouter } from "next/router";
 export type CartContextType = {
   addToCart: (productID: ObjectId) => void;
   cart: ObjectId[];
@@ -55,10 +56,22 @@ export const Column = styled.div`
 `;
 
 export default function Featured({ featuredProduct }: any) {
+  const router = useRouter();
   const [imageUrl, setImageUrl] = useState("");
   const { data: session } = useSession();
   const imageListReference = ref(productStorage, `${featuredProduct?.title}/`);
   const { cart, setCart } = useContext<CartContextType>(CartContext);
+  const [productImages,setProductsImages] = useState([]);
+
+  useEffect(()=>{
+    if(localStorage){
+      setProductsImages(JSON.parse(localStorage.getItem("product_images") || "[]"));
+    }
+    else{
+      console.log("Local Storage not defined");
+    }
+  },[])
+
   useEffect(() => {
     listAll(imageListReference)
       .then((response: any) => {
@@ -118,6 +131,16 @@ export default function Featured({ featuredProduct }: any) {
     }
   };
 
+  const moreDetails = (featuredProduct: any) => {
+    router.push({
+      pathname: `products/${featuredProduct?._id}`,
+      query:{
+        imageUrl: productImages[featuredProduct?.title][0],
+        properties: featuredProduct?.properties,
+      }
+    })
+  }
+
   return (
     <Bg>
       <Center>
@@ -127,7 +150,7 @@ export default function Featured({ featuredProduct }: any) {
               <Title>{featuredProduct?.title}</Title>
               <Description>{featuredProduct?.description}</Description>
               <Column>
-                <NeutralButton size="large">More</NeutralButton>
+                <NeutralButton size="large" onClick={() => moreDetails(featuredProduct)}>More</NeutralButton>
                 <PrimaryButton size="large" onClick={(e: React.MouseEvent<HTMLButtonElement>) => addFeaturedProductToCart()}>
                   <Cart />
                   Add

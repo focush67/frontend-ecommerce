@@ -111,8 +111,8 @@ export async function getServerSideProps() {
   
   return {
     props: {
-      newProducts: JSON.parse(JSON.stringify(newProducts)),
-      featuredProduct: JSON.parse(JSON.stringify(featuredProduct)),
+      newProducts: newProducts ? JSON.parse(JSON.stringify(newProducts)) : null,
+      featuredProduct: featuredProduct ? JSON.parse(JSON.stringify(featuredProduct)) : null,
       
     },
   };
